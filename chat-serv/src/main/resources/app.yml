@@ -7,7 +7,7 @@ chat.serv:
 solon.logging.appender:
   console:
     level: info
-    pattern: "%highlight(%-5level %d{yyyy-MM-dd HH:mm:ss.SSS} [-%t][*%X{traceId}]%tags%boldMagenta([%logger{20}]) =>) %n%msg%n"
+    pattern: "%highlight(%-5level %d{yyyy-MM-dd HH:mm:ss.SSS} [-%t][*%X{traceId}]%tags%boldMagenta([%logger{20}]) =>) %msg%n"
   file:
     name: "logs/${solon.app.name}"
     level: INFO
