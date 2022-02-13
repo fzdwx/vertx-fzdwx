@@ -53,6 +53,11 @@
                 <version>${solon.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>logback-solon-plugin</artifactId>
+                <version>${solon.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-core</artifactId>
                 <version>${vertx.version}</version>
