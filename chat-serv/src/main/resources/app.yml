@@ -2,6 +2,7 @@ solon.app:
   name: chat-serv
 chat.serv:
   port: 11111
+  eventLoopPoolSize: 100
 
 # solon log
 solon.logging.appender:

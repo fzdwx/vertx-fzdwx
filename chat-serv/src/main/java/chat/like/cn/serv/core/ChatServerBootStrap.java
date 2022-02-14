@@ -5,6 +5,7 @@ import chat.like.cn.core.util.StopWatch;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,7 +22,7 @@ public class ChatServerBootStrap {
 
     public ChatServerBootStrap(final ChatServerProps chatServerProps) {
         this.chatServerProps = chatServerProps;
-        vertx = Vertx.vertx(chatServerProps);
+        vertx = Vertx.vertx(chatServerProps.getVertxOps());
     }
 
     public ChatServerBootStrap start() {
@@ -35,7 +36,9 @@ public class ChatServerBootStrap {
                         log.error("started fail ", http.cause());
                     }
                 });
+        // final Router router = Router.router(vertx);
 
+        vertx.deployVerticle("chatServer-vert.x", chatServerProps.getDeployOps());
         return this;
     }
 

@@ -1,5 +1,6 @@
 package chat.like.cn.serv.core;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.VertxOptions;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +13,24 @@ import org.noear.solon.annotation.Get;
 @Setter
 @Getter
 @Get
-public class ChatServerProps extends VertxOptions {
+public class ChatServerProps {
 
-    /** 当前chat server监听的端口 */
+    /**
+     * 当前chat server监听的端口
+     */
     private int port = 8888;
+
+    /**
+     * {@link VertxOptions#getEventLoopPoolSize()}
+     */
+    private int eventLoopPoolSize;
+
+    public VertxOptions getVertxOps() {
+        return new VertxOptions();
+    }
+
+    public DeploymentOptions getDeployOps() {
+        return new DeploymentOptions();
+    }
+
 }
