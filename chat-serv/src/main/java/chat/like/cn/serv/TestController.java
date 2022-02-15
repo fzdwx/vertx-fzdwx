@@ -9,6 +9,7 @@ import org.noear.solon.annotation.Mapping;
  * @date 2022/2/13 16:10
  */
 @Controller
+@Mapping("/qweqwe")
 public class TestController {
 
     @Get

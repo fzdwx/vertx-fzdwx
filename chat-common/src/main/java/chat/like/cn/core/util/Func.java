@@ -47,6 +47,16 @@ public interface Func {
     }
 
     /**
+     * 如果 value 为null 则返回defVal
+     */
+    static String defVal(String value, String defVal) {
+        if (StrUtil.isBlank(value)) {
+            return defVal;
+        }
+        return value;
+    }
+
+    /**
      * 格式化，占位符使用{}
      */
     static String format(String template, Object... params) {return format(template, StrPool.EMPTY_JSON, params);}

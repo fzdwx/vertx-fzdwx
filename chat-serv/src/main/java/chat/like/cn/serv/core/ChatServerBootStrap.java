@@ -1,10 +1,8 @@
 package chat.like.cn.serv.core;
 
-import chat.like.cn.core.util.ChatUtil;
 import chat.like.cn.core.util.StopWatch;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,8 +24,10 @@ public class ChatServerBootStrap {
     }
 
     public ChatServerBootStrap start() {
+        final Router router = Router.router(vertx);
+
         chatServer = vertx.createHttpServer()
-                .requestHandler(this::dispatcher)
+                .requestHandler(router)
                 .listen(chatServerProps.getPort(), http -> {
                     if (http.succeeded()) {
                         ServerURL = "http://localhost:" + chatServerProps.getPort();
@@ -36,30 +36,8 @@ public class ChatServerBootStrap {
                         log.error("started fail ", http.cause());
                     }
                 });
-        // final Router router = Router.router(vertx);
 
         vertx.deployVerticle("chatServer-vert.x", chatServerProps.getDeployOps());
         return this;
-    }
-
-    private void dispatcher(final HttpServerRequest req) {
-        if (ChatUtil.isWs(req))
-            doWs(req);
-        else doHttp(req);
-    }
-
-    private void doHttp(final HttpServerRequest req) {
-        req.response()
-                .putHeader("content-type", "text/plain")
-                .end("Hello from Vert.x!");
-    }
-
-    private void doWs(final HttpServerRequest req) {
-        req.toWebSocket()
-                .onSuccess(ws -> {
-                    ws.frameHandler(f -> {
-                        // f. todo
-                    });
-                });
     }
 }
