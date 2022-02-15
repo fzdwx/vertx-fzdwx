@@ -1,6 +1,12 @@
 package chat.like.cn.core.util;
 
-import static org.noear.solon.core.util.PrintUtil.*;
+import static org.noear.solon.core.util.PrintUtil.ANSI_BLUE;
+import static org.noear.solon.core.util.PrintUtil.ANSI_CYAN;
+import static org.noear.solon.core.util.PrintUtil.ANSI_RESET;
+import static org.noear.solon.core.util.PrintUtil.blueln;
+import static org.noear.solon.core.util.PrintUtil.greenln;
+import static org.noear.solon.core.util.PrintUtil.redln;
+import static org.noear.solon.core.util.PrintUtil.yellowln;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -9,6 +15,12 @@ import static org.noear.solon.core.util.PrintUtil.*;
 public class Print {
 
     private final static String PREFIX = "[Chat] ";
+
+    public static void print(String label, Object content) {
+        System.out.print(PREFIX);
+        System.out.println(ANSI_BLUE + label+" => " + ANSI_CYAN + content);
+        System.out.print(ANSI_RESET);
+    }
 
     public static void debug(Object content) {
         System.out.print(PREFIX);

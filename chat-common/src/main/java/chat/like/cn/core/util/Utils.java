@@ -1,5 +1,12 @@
 package chat.like.cn.core.util;
 
+import org.noear.solon.annotation.Delete;
+import org.noear.solon.annotation.Get;
+import org.noear.solon.annotation.Head;
+import org.noear.solon.annotation.Patch;
+import org.noear.solon.annotation.Post;
+import org.noear.solon.annotation.Put;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -45,6 +52,16 @@ public interface Utils {
                         .toList()
                         .size() > 0)
                 .collect(Collectors.toList());
+    }
 
+    static List<Class<? extends Annotation>> allHttpType() {
+        return List.of(
+                Get.class,
+                Post.class,
+                Put.class,
+                Delete.class,
+                Patch.class,
+                Head.class
+        );
     }
 }
