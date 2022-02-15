@@ -53,18 +53,6 @@ public class ChatServSolonStarter {
 
                     return WebSocketListenerMapping.create(beanWrap.get(), serverEndpoint);
                 }).toList();
-
-    }
-
-    private static boolean wxCondition(final BeanWrap beanWrap) {
-        final var serverEndpoint = beanWrap.annotationGet(ServerEndpoint.class);
-        if (serverEndpoint == null) return false;
-
-        if (!contains(beanWrap.clz().getInterfaces(), WebSocketListener.class)) {
-            log.error("Websocket endpoint 必须实现: java.net.http.Listener.java");
-            System.exit(1);
-        }
-        return true;
     }
 
     public Supplier<List<HttpHandlerMapping>> collectHttp() {
@@ -78,11 +66,20 @@ public class ChatServSolonStarter {
 
                     return Utils.collectMethod(beanWrap.clz().getDeclaredMethods(), Utils.allHttpType())
                             .stream().map(MethodWrap::get)
-                            .map(methodWrap -> {
-                                return HttpHandlerMapping.create(beanWrap.get(), methodWrap, rootPath);
-                            });
+                            .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap, rootPath));
                 })
                 .toList();
+    }
+
+    private static boolean wxCondition(final BeanWrap beanWrap) {
+        final var serverEndpoint = beanWrap.annotationGet(ServerEndpoint.class);
+        if (serverEndpoint == null) return false;
+
+        if (!contains(beanWrap.clz().getInterfaces(), WebSocketListener.class)) {
+            log.error("Websocket endpoint 必须实现: java.net.http.Listener.java");
+            System.exit(1);
+        }
+        return true;
     }
 
     private static boolean httpCondition(final BeanWrap beanWrap) {

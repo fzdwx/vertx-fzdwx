@@ -46,6 +46,8 @@ public class WebSocketListenerMapping {
         router.get(path)
                 .handler(ctx -> {
                     ctx.request().toWebSocket().onSuccess(ws -> {
+
+                        // onClose
                         ws.closeHandler(h -> {
                             source.doOnClose(ws);
                         });
@@ -90,7 +92,7 @@ public class WebSocketListenerMapping {
                         });
 
                         ws.endHandler(end -> {
-
+                            log.info("Websocket Stream End");
                         });
                     });
                 });
