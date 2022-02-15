@@ -1,5 +1,7 @@
 # chat Project
+ 
+- vert.x
+  - 作为框架的网络
 
 
-todo
-1. 参考solon实现ws与http的路由管理
+websocket测试网站：http://www.easyswoole.com/wstool.html
