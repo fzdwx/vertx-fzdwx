@@ -34,7 +34,7 @@ public interface WebSocketListener {
      *     exception: 表示失败要发送给客户端的信息(只有当失败时才会被处理)
      * </pre>
      */
-    default Tuple2<Boolean, Exception> doOnHandShake(MultiMap headers) {
+    default Tuple2<Boolean, Exception> onHandShake(MultiMap headers) {
         // default impl
         return handShakeSuccess;
     }
@@ -44,14 +44,24 @@ public interface WebSocketListener {
      *
      * @param ws ws
      */
-    void doOnOpen(final ServerWebSocket ws);
+    void onOpen(final ServerWebSocket ws);
 
     /**
      * 当websocket 通道关闭时调用
      *
      * @param ws ws
      */
-    void doOnClose(final ServerWebSocket ws);
+    void onclose(final ServerWebSocket ws);
+
+    /**
+     * 当websocket发生错误
+     *
+     * @param ws  websocket
+     * @param thr thr
+     */
+    default void onError(ServerWebSocket ws, Throwable thr) {
+        Print.print("websocket has error", thr);
+    }
 
     /**
      * 处理二进制数据
@@ -93,13 +103,12 @@ public interface WebSocketListener {
         ws.writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG")));
     }
 
-    default void onHandShake(MultiMap headers, Handler<AsyncResult<Integer>> resultHandler) {
-        final var res = doOnHandShake(headers);
+    default void doOnHandShake(MultiMap headers, Handler<AsyncResult<Integer>> resultHandler) {
+        final var res = onHandShake(headers);
 
         if (res == null || res.t1 == Boolean.FALSE)
             resultHandler.handle(Future.failedFuture(Func.defVal(res, handShakeFail).t2));
         else
             resultHandler.handle(Future.succeededFuture());
     }
-
 }

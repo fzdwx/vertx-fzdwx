@@ -48,11 +48,11 @@ public class WebSocketListenerMapping {
                     ctx.request().toWebSocket().onSuccess(ws -> {
                         // onClose
                         ws.closeHandler(h -> {
-                            source.doOnClose(ws);
+                            source.onclose(ws);
                         });
 
                         //region websocket 握手  1
-                        source.onHandShake(ws.headers(), ar -> {
+                        source.doOnHandShake(ws.headers(), ar -> {
                             if (ar.failed()) {
                                 ws.writeTextMessage(ar.cause().getMessage())
                                         .onComplete(h -> {
@@ -63,7 +63,7 @@ public class WebSocketListenerMapping {
                         //endregion
 
                         // onOpen               2
-                        source.doOnOpen(ws);
+                        source.onOpen(ws);
 
                         //region 处理来自客户端的数据
                         ws.pongHandler(buf -> {
@@ -87,7 +87,7 @@ public class WebSocketListenerMapping {
 
                         // websocket 中的异常
                         ws.exceptionHandler(exc -> {
-                            log.error("Websocket Exception ", exc);
+                            source.onError(ws, exc);
                         });
 
                         // 在onClose后执行  todo 是否要加入webSocketListener中？

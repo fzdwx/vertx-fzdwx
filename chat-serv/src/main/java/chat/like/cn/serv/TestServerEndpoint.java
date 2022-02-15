@@ -12,12 +12,12 @@ import org.noear.solon.annotation.ServerEndpoint;
 public class TestServerEndpoint implements WebSocketListener {
 
     @Override
-    public void doOnOpen(final ServerWebSocket ws) {
+    public void onOpen(final ServerWebSocket ws) {
         ws.writeTextMessage("你好");
     }
 
     @Override
-    public void doOnClose(final ServerWebSocket ws) {
+    public void onclose(final ServerWebSocket ws) {
         System.out.println("web socket 关闭");
     }
 }
