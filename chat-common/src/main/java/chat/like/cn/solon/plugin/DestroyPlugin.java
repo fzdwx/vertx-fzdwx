@@ -1,19 +1,22 @@
 package chat.like.cn.solon.plugin;
 
 import chat.like.cn.core.function.lang;
-import chat.like.cn.solon.SolonUtil;
 import chat.like.cn.solon.annotation.Destroy;
 import org.noear.solon.SolonApp;
 import org.noear.solon.core.Aop;
 import org.noear.solon.core.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
  * @date 2022/2/16 16:14
  */
 public class DestroyPlugin implements Plugin {
+
+    private final List<Runnable> destroyMethod = new ArrayList<>();
 
     @Override
     public void start(final SolonApp app) {
@@ -22,7 +25,7 @@ public class DestroyPlugin implements Plugin {
                 throw new IllegalArgumentException(lang.format("@Destroy 注解不支持参数注入: {}", method.toString()));
             }
 
-            SolonUtil.addStopHook(() -> {
+            destroyMethod.add(() -> {
                 try {
                     method.invoke(be.get());
                 } catch (IllegalAccessException | InvocationTargetException e) {
@@ -30,5 +33,10 @@ public class DestroyPlugin implements Plugin {
                 }
             });
         });
+    }
+
+    @Override
+    public void prestop() throws Throwable {
+        destroyMethod.forEach(Runnable::run);
     }
 }
