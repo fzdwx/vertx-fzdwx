@@ -2,7 +2,7 @@ package chat.like.cn.serv.core;
 
 import chat.like.cn.core.util.Exc;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.web.Router;
+import io.vertx.mutiny.ext.web.Router;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.annotation.Mapping;
@@ -12,7 +12,7 @@ import org.noear.solon.core.wrap.MethodWrap;
 
 import java.util.ArrayList;
 
-import static chat.like.cn.core.util.lang.defVal;
+import static chat.like.cn.core.function.lang.*;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
@@ -52,11 +52,9 @@ public class HttpHandlerMapping {
      */
     public void attach(final Router router) {
         log.info("Http Handler Registered: {}", this.path);
-
         router.route(HttpMethod.valueOf(this.httpMethodType.name), this.path)
                 .handler(rCtx -> {
-                    final var result = this.invoke();
-                    rCtx.json(result);
+                    rCtx.json(this.invoke()).onItem();
                 });
     }
 
@@ -77,6 +75,6 @@ public class HttpHandlerMapping {
     }
 
     private MethodType initMethodType(final MethodWrap methodWrap) {
-        return MethodTypeUtil.findAndFill(new ArrayList<>(), c -> methodWrap.getAnnotation(c) != null).stream().findFirst().orElseThrow(() -> Exc.chat(methodWrap.getName() + " 为识别出Http method Type"));
+        return MethodTypeUtil.findAndFill(new ArrayList<>(), c -> methodWrap.getAnnotation(c) != null).stream().findFirst().orElseThrow(() -> Exc.chat(methodWrap.getName() + " 未识别出Http method Type"));
     }
 }

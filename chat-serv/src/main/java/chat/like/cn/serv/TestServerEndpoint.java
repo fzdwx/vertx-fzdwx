@@ -1,7 +1,7 @@
 package chat.like.cn.serv;
 
 import chat.like.cn.serv.core.WebSocketListener;
-import io.vertx.core.http.ServerWebSocket;
+import io.vertx.mutiny.core.http.ServerWebSocket;
 import org.noear.solon.annotation.ServerEndpoint;
 
 /**
@@ -13,7 +13,7 @@ public class TestServerEndpoint implements WebSocketListener {
 
     @Override
     public void onOpen(final ServerWebSocket ws) {
-        ws.writeTextMessage("你好");
+        ws.writeTextMessage("你好").subscribe();
     }
 
     @Override

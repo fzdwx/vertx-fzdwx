@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static chat.like.cn.core.util.lang.eq;
+import static chat.like.cn.core.function.lang.eq;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>

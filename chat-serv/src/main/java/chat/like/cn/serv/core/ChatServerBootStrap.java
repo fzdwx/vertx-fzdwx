@@ -1,13 +1,11 @@
 package chat.like.cn.serv.core;
 
-import chat.like.cn.core.util.StopWatch;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
-import io.vertx.ext.web.Router;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.core.http.HttpServer;
+import io.vertx.mutiny.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -21,46 +19,50 @@ public class ChatServerBootStrap {
     public static String serverURL;
 
     private final ChatServerProps chatServerProps;
-    private final List<HttpHandlerMapping> httpHandlerMappings;
-    private final List<WebSocketListenerMapping> webSocketListenerMappings;
     private final Router router;
+    private volatile Boolean startedFlag = Boolean.FALSE;
 
-    public ChatServerBootStrap(final ChatServerProps chatServerProps, final Supplier<List<HttpHandlerMapping>> httpHandlerSup,
-                               final Supplier<List<WebSocketListenerMapping>> websocketSup) {
+    public ChatServerBootStrap(final ChatServerProps chatServerProps, final Multi<HttpHandlerMapping> httpHandlerSup,
+                               final Multi<WebSocketListenerMapping> websocketSup) {
         this.chatServerProps = chatServerProps;
         serverURL = "http://localhost:" + chatServerProps.getPort();
         vertx = Vertx.vertx(chatServerProps.getVertxOps());
         this.router = Router.router(vertx);
-        this.httpHandlerMappings = httpHandlerSup.get();
-        this.webSocketListenerMappings = websocketSup.get();
+        initWsHandler(websocketSup);
+        initHttpHandler(httpHandlerSup);
     }
 
-    public ChatServerBootStrap start() {
-        initHttpHandler();
-        initWsHandler();
+    public Uni<ChatServerBootStrap> start() {
+        synchronized (this) {
+            if (!startedFlag) {
 
-        chatServer = vertx.createHttpServer()
-                // .exceptionHandler(ex -> {
-                //     log.error("", ex.getCause());
-                // })
-                .requestHandler(router)
-                .listen(chatServerProps.getPort(), http -> {
-                    if (http.succeeded()) {
-                        log.info("started in " + StopWatch.stop() + " ms. Listening on: " + serverURL);
-                    } else {
-                        log.error("started fail ", http.cause());
-                    }
-                });
-
-        vertx.deployVerticle("chatServer-vert.x", chatServerProps.getDeployOps());
-        return this;
+                return vertx.createHttpServer()
+                        // .exceptionHandler(ex -> {
+                        //     log.error("", ex.getCause());
+                        // })
+                        .requestHandler(router)
+                        .listen(chatServerProps.getPort())
+                        .onItem().invoke(h -> {
+                            chatServer = h;
+                            vertx.deployVerticle(chatServerProps.getAppName() + "-vert.x", chatServerProps.getDeployOps()).subscribe();
+                            startedFlag = Boolean.TRUE;
+                        })
+                        .onFailure().invoke(thr -> {
+                            log.error("started fail ", thr.getCause());
+                            System.exit(1);
+                        })
+                        .replaceWith(Uni.createFrom().item(() -> this));
+            } else throw new RuntimeException(chatServerProps.getAppName() + " is started!");
+        }
     }
 
-    private void initWsHandler() {
-        webSocketListenerMappings.forEach(w -> { w.attach(router); });
+    private void initWsHandler(final Multi<WebSocketListenerMapping> websocketSup) {
+        websocketSup.onItem().invoke(w -> { w.attach(router); })
+                .subscribe();
     }
 
-    private void initHttpHandler() {
-        httpHandlerMappings.forEach(h -> h.attach(router));
+    private void initHttpHandler(final Multi<HttpHandlerMapping> httpHandlerSup) {
+        httpHandlerSup.onItem().invoke(h -> { h.attach(router); })
+                .subscribe();
     }
 }

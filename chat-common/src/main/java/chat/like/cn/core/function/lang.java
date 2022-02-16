@@ -1,4 +1,4 @@
-package chat.like.cn.core.util;
+package chat.like.cn.core.function;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
