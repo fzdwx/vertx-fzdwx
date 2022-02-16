@@ -1,5 +1,7 @@
 package chat.like.cn.serv;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Get;
 import org.noear.solon.annotation.Mapping;
@@ -10,11 +12,14 @@ import org.noear.solon.annotation.Mapping;
  */
 @Controller
 @Mapping("/qweqwe")
+@Slf4j
 public class TestController {
 
+    @SneakyThrows
     @Get
     @Mapping("/hello")
     public String hello() {
+        log.info("invoke");
         return "key:" + "helloworld1231231";
     }
 }

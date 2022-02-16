@@ -1,10 +1,9 @@
 package chat.like.cn.serv.core;
 
+import chat.like.cn.serv.constants.SharDataCons;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.core.http.HttpServer;
-import io.vertx.mutiny.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,63 +13,33 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChatServerBootStrap {
 
-    public static HttpServer chatServer;
-    public static Vertx vertx;
-    public static String serverURL;
-
-    private final ChatServerProps chatServerProps;
-    private final Router router;
-    private volatile Boolean startedFlag = Boolean.FALSE;
+    public static ChatServerProps chatServerProps;
+    public static Multi<HttpHandlerMapping> httpHandlerSup;
+    public static Multi<WebSocketListenerMapping> websocketSup;
+    private final Vertx vertx;
 
     public ChatServerBootStrap(final ChatServerProps chatServerProps, final Multi<HttpHandlerMapping> httpHandlerSup,
                                final Multi<WebSocketListenerMapping> websocketSup) {
-        this.chatServerProps = chatServerProps;
-        serverURL = "http://localhost:" + chatServerProps.getPort();
-        vertx = Vertx.vertx(chatServerProps.getVertxOps());
-        this.router = Router.router(vertx);
-        initWsHandler(websocketSup);
-        initHttpHandler(httpHandlerSup);
+        this.vertx = Vertx.vertx(chatServerProps.getVertxOps());
+        SharDataCons.vertx = vertx;
+        vertx.sharedData().getAsyncMap(SharDataCons.INIT_VERTX_MAp).onItem()
+                .invoke(map -> {
+                    map.put(SharDataCons.chatServerProps, chatServerProps).subscribe();
+                    map.put(SharDataCons.httpHandlerSup, httpHandlerSup).subscribe();
+                    map.put(SharDataCons.websocketSup, websocketSup).subscribe();
+                }).subscribe();
+
+        // TODO: 2022/2/16  SharData 包装
+        ChatServerBootStrap.chatServerProps = chatServerProps;
+        ChatServerBootStrap.httpHandlerSup = httpHandlerSup;
+        ChatServerBootStrap.websocketSup = websocketSup;
     }
 
-    public Uni<ChatServerBootStrap> start() {
-        synchronized (this) {
-            if (!startedFlag) {
-                return vertx.createHttpServer()
-                        // .exceptionHandler(ex -> {
-                        //     log.error("", ex.getCause());
-                        // })
-                        .requestHandler(router)
-                        .listen(chatServerProps.getPort())
-                        .onItem().invoke(h -> {
-                            chatServer = h;
-                            vertx.deployVerticle(chatServerProps.getAppName() + "-vert.x", chatServerProps.getDeployOps()).subscribe();
-                            startedFlag = Boolean.TRUE;
-                        })
-                        .onFailure().invoke(thr -> {
-                            log.error("started fail {}", thr.getMessage());
-                            System.exit(1);
-                        })
-                        .replaceWith(Uni.createFrom().item(() -> this));
-            } else throw new RuntimeException(chatServerProps.getAppName() + " is started!");
-        }
+    public Uni<String> start() {
+        return vertx.deployVerticle("chat.like.cn.serv.core.ChatServerVertx", chatServerProps.getDeployOps());
     }
 
     public void stop() {
-        vertx.closeAndAwait();
-    }
-
-    private void initWsHandler(final Multi<WebSocketListenerMapping> websocketSup) {
-        // TODO: 2022/2/16 有问题
-        websocketSup.subscribe()
-                .asIterable().forEach(w -> {
-                    w.attach(router);
-                });
-    }
-
-    private void initHttpHandler(final Multi<HttpHandlerMapping> httpHandlerSup) {
-        httpHandlerSup.subscribe()
-                .asIterable().forEach(w -> {
-                    w.attach(router);
-                });
+        this.vertx.closeAndAwait();
     }
 }

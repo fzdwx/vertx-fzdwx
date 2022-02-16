@@ -2,7 +2,9 @@ solon.app:
   name: chat-serv
 chat.serv:
   port: 11111
-  eventLoopPoolSize: 100
+#  workerPoolSize: 100
+#  eventLoopPoolSize: 100
+#  deployInstances: 16
 
 # solon log
 solon.logging.appender:

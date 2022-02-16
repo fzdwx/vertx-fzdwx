@@ -26,15 +26,27 @@ public class ChatServerProps {
     /**
      * {@link VertxOptions#getEventLoopPoolSize()}
      */
-    private int eventLoopPoolSize;
+    private int eventLoopPoolSize = VertxOptions.DEFAULT_EVENT_LOOP_POOL_SIZE;
 
+    /**
+     * {@link VertxOptions#getWorkerPoolSize()}
+     */
+    private int workerPoolSize = VertxOptions.DEFAULT_WORKER_POOL_SIZE;
+
+    /**
+     * {@link DeploymentOptions#getInstances()}
+     */
+    private int deployInstances = 1;
 
     public VertxOptions getVertxOps() {
-        return new VertxOptions();
+        return new VertxOptions()
+                .setEventLoopPoolSize(eventLoopPoolSize)
+                .setWorkerPoolSize(workerPoolSize);
     }
 
     public DeploymentOptions getDeployOps() {
-        return new DeploymentOptions();
+        return new DeploymentOptions().setInstances(deployInstances)
+                .setWorker(true);
     }
 
 }

@@ -42,18 +42,17 @@ public class ChatServSolonStarter {
     private ChatServerProps chatServerProps;
     private ChatServerBootStrap chatServerBootStrap;
 
+    // vertx.deployVerticle(chatServerProps.getAppName() + "-vert.x", chatServerProps.getDeployOps()).await().indefinitely();
     @Init
     public void init() {
         StopWatch.start();
 
-        chatServerBootStrap = new ChatServerBootStrap(chatServerProps, collectHttp(), collectWs())
-                .start()
-                .onItem().invoke(bs -> {
-                    log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + ChatServerBootStrap.serverURL);
-                    Aop.inject(bs);
-                })
-                .await()
-                .atMost(Duration.ofSeconds(3));
+        chatServerBootStrap = new ChatServerBootStrap(chatServerProps, collectHttp(), collectWs());
+        chatServerBootStrap.start()
+                .onItem().invoke(() -> {
+                    log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
+                    // Aop.inject(bs);
+                }).await().atMost(Duration.ofSeconds(10));
     }
 
     @Destroy
