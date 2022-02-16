@@ -9,6 +9,7 @@ import chat.like.cn.serv.core.ChatServerProps;
 import chat.like.cn.serv.core.HttpHandlerMapping;
 import chat.like.cn.serv.core.WebSocketListener;
 import chat.like.cn.serv.core.WebSocketListenerMapping;
+import chat.like.cn.solon.annotation.Destroy;
 import cn.hutool.core.util.StrUtil;
 import io.smallrye.mutiny.Multi;
 import io.vertx.core.http.HttpMethod;
@@ -28,7 +29,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 
 import static chat.like.cn.core.function.lang.*;
-import static chat.like.cn.solon.SolonUtil.addStopHook;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -51,10 +51,14 @@ public class ChatServSolonStarter {
                 .onItem().invoke(bs -> {
                     log.info("started in " + StopWatch.stop() + " ms. Listening on: " + ChatServerBootStrap.serverURL);
                     Aop.inject(bs);
-                    addStopHook(bs::stop);
                 })
                 .await()
                 .atMost(Duration.ofSeconds(3));
+    }
+
+    @Destroy
+    public void destroy() {
+        chatServerBootStrap.stop();
     }
 
     public Multi<WebSocketListenerMapping> collectWs() {
