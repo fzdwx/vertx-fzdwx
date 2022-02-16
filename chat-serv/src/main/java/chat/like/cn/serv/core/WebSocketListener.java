@@ -14,7 +14,7 @@ import io.vertx.mutiny.core.http.ServerWebSocket;
 import io.vertx.mutiny.core.http.WebSocketFrame;
 
 /**
- * {@link org.noear.solon.annotation.ServerEndpoint} websocket endpoint 必须实现该类
+ * websocket endpoint 必须实现该类
  *
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
  * @date 2022/2/15 14:26
