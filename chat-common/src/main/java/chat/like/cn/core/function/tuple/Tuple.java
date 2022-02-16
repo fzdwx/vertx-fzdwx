@@ -8,7 +8,7 @@ package chat.like.cn.core.function.tuple;
  */
 public interface Tuple {
 
-    static <T1, T2> Tuple2<T1, T2> t2(final T1 t1, final T2 t2) {
+    static <T1, T2> Tuple2<T1, T2> of(final T1 t1, final T2 t2) {
         return new Tuple2<>(t1, t2);
     }
 
