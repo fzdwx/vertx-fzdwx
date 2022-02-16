@@ -88,7 +88,7 @@ public class ChatServSolonStarter {
         if (serverEndpoint == null) return false;
 
         if (!contains(beanWrap.clz().getInterfaces(), WebSocketListener.class)) {
-            log.error("Websocket endpoint 必须实现: java.net.http.Listener.java");
+            log.error("Websocket endpoint 必须实现: chat.like.cn.serv.core.WebSocketListener.java");
             System.exit(1);
         }
         return true;
