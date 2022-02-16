@@ -3,15 +3,15 @@ package chat.like.cn.serv.core;
 import chat.like.cn.core.function.tuple.Tuple;
 import chat.like.cn.core.function.tuple.Tuple2;
 import chat.like.cn.core.util.Exc;
-import chat.like.cn.core.util.lang;
 import chat.like.cn.core.util.Print;
+import chat.like.cn.core.function.lang;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.MultiMap;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.ServerWebSocket;
-import io.vertx.core.http.WebSocketFrame;
+import io.vertx.mutiny.core.MultiMap;
+import io.vertx.mutiny.core.buffer.Buffer;
+import io.vertx.mutiny.core.http.ServerWebSocket;
+import io.vertx.mutiny.core.http.WebSocketFrame;
 
 /**
  * {@link org.noear.solon.annotation.ServerEndpoint} websocket endpoint 必须实现该类
@@ -90,7 +90,7 @@ public interface WebSocketListener {
      * @param buf 数据帧
      */
     default void handlePong(final ServerWebSocket ws, Buffer buf) {
-        ws.writeFrame(WebSocketFrame.pingFrame(Buffer.buffer("PING")));
+        ws.writeFrame(WebSocketFrame.pingFrame(Buffer.buffer("PING"))).subscribe();
     }
 
     /**
@@ -100,14 +100,13 @@ public interface WebSocketListener {
      * @param frame 数据帧
      */
     default void handlePing(final ServerWebSocket ws, WebSocketFrame frame) {
-        ws.writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG")));
+        ws.writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG"))).subscribe();
     }
 
     default void doOnHandShake(MultiMap headers, Handler<AsyncResult<Integer>> resultHandler) {
         final var res = onHandShake(headers);
-
-        if (res == null || res.t1 == Boolean.FALSE)
-            resultHandler.handle(Future.failedFuture(lang.defVal(res, handShakeFail).t2));
+        if (res == null || res.A == Boolean.FALSE)
+            resultHandler.handle(Future.failedFuture(lang.defVal(res, handShakeFail).B));
         else
             resultHandler.handle(Future.succeededFuture());
     }

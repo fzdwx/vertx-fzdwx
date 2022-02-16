@@ -16,6 +16,11 @@ import org.noear.solon.annotation.Get;
 public class ChatServerProps {
 
     /**
+     * 应用程序名称
+     */
+    private String appName = "chatServer";
+
+    /**
      * 当前chat server监听的端口
      */
     private int port = 8888;
@@ -24,6 +29,7 @@ public class ChatServerProps {
      * {@link VertxOptions#getEventLoopPoolSize()}
      */
     private int eventLoopPoolSize;
+
 
     public VertxOptions getVertxOps() {
         return new VertxOptions();
