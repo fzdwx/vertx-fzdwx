@@ -9,6 +9,8 @@ import chat.like.cn.serv.core.WebSocketListener;
 import chat.like.cn.serv.core.WebSocketListenerMapping;
 import io.smallrye.mutiny.Multi;
 import lombok.extern.slf4j.Slf4j;
+import org.noear.solon.Solon;
+import org.noear.solon.SolonApp;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Init;
@@ -17,6 +19,8 @@ import org.noear.solon.annotation.Mapping;
 import org.noear.solon.annotation.ServerEndpoint;
 import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
+import org.noear.solon.core.Plugin;
+import org.noear.solon.core.PluginEntity;
 import org.noear.solon.core.wrap.MethodWrap;
 
 import java.time.Duration;
@@ -33,16 +37,18 @@ public class ChatServSolonStarter {
 
     @Inject("${chat.serv}")
     private ChatServerProps chatServerProps;
+    private ChatServerBootStrap chatServerBootStrap;
 
     @Init
     public void init() {
         StopWatch.start();
 
-        new ChatServerBootStrap(chatServerProps, collectHttp(), collectWs())
+        chatServerBootStrap = new ChatServerBootStrap(chatServerProps, collectHttp(), collectWs())
                 .start()
                 .onItem().invoke(bs -> {
                     log.info("started in " + StopWatch.stop() + " ms. Listening on: " + ChatServerBootStrap.serverURL);
                     Aop.inject(bs);
+                    addStopHook(bs);
                 })
                 .await()
                 .atMost(Duration.ofSeconds(3));
@@ -87,5 +93,15 @@ public class ChatServSolonStarter {
 
     private static boolean httpCondition(final BeanWrap beanWrap) {
         return beanWrap.annotationGet(Controller.class) != null;
+    }
+
+    private void addStopHook(final ChatServerBootStrap bs) {
+        Solon.cfg().plugs().add(new PluginEntity(new Plugin() {
+            @Override
+            public void start(final SolonApp app) { }
+
+            @Override
+            public void stop() throws Throwable { bs.stop(); }
+        }));
     }
 }

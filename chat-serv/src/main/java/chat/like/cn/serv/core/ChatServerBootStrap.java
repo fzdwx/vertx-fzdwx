@@ -55,6 +55,10 @@ public class ChatServerBootStrap {
         }
     }
 
+    public void stop() {
+        vertx.closeAndAwait();
+    }
+
     private void initWsHandler(final Multi<WebSocketListenerMapping> websocketSup) {
         // TODO: 2022/2/16 有问题
         websocketSup.subscribe()
