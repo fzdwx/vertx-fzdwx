@@ -54,3 +54,6 @@ todo
 - 完善http封装
 - 集群方案
 - 日志打印问题
+```java
+getVertx().createHttpServer() .requestHandler(router::accept) .listen(Config.GetEVotePort(), startedEvent -> {..}); ... router.mountSubRouter("/api",HttpEndpoint.createHttpRoutes( getVertx(), in.getType()));
+```
