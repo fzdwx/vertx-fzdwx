@@ -4,7 +4,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.VertxOptions;
 import lombok.Getter;
 import lombok.Setter;
-import org.noear.solon.annotation.Get;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -12,7 +11,6 @@ import org.noear.solon.annotation.Get;
  */
 @Setter
 @Getter
-@Get
 public class ChatServerProps {
 
     /**

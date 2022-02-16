@@ -15,6 +15,6 @@ public class TestController {
     @Get
     @Mapping("/hello")
     public String hello() {
-        return "hel123lo444444123123";
+        return "key:" + "helloworld";
     }
 }

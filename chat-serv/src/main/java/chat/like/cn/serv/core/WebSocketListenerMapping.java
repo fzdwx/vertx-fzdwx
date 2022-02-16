@@ -1,12 +1,7 @@
 package chat.like.cn.serv.core;
 
-import chat.like.cn.core.util.Exc;
-import cn.hutool.core.util.StrUtil;
 import io.vertx.mutiny.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
-import org.noear.solon.annotation.ServerEndpoint;
-
-import static chat.like.cn.core.function.lang.*;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
@@ -16,26 +11,21 @@ import static chat.like.cn.core.function.lang.*;
 public class WebSocketListenerMapping {
 
     /**
-     * 添加了{@link ServerEndpoint}注解的类的实体
+     * {@link WebSocketListener} 实现类
      */
     private final WebSocketListener source;
-    /**
-     * source上对应的注解
-     */
-    private final ServerEndpoint anno;
     /**
      * 当前的路径
      */
     private final String path;
 
-    private WebSocketListenerMapping(final WebSocketListener webSocketListener, final ServerEndpoint anno) {
+    private WebSocketListenerMapping(final WebSocketListener webSocketListener,String path) {
         this.source = webSocketListener;
-        this.anno = anno;
-        this.path = initPath();
+        this.path = path;
     }
 
-    public static WebSocketListenerMapping create(WebSocketListener source, ServerEndpoint anno) {
-        return new WebSocketListenerMapping(source, anno);
+    public static WebSocketListenerMapping create(WebSocketListener source,String path) {
+        return new WebSocketListenerMapping(source,path);
     }
 
     /**
@@ -101,14 +91,5 @@ public class WebSocketListenerMapping {
                                 });
                             }).subscribe();
                 });
-    }
-
-
-    private String initPath() {
-        final var path = defVal(anno.value(), anno.path());
-        if (StrUtil.isBlank(path)) {
-            throw Exc.chat("路径不能为空");
-        }
-        return path;
     }
 }

@@ -1,16 +1,18 @@
 package chat.like.cn.serv.solon;
 
+import chat.like.cn.core.util.Exc;
 import chat.like.cn.core.util.StopWatch;
 import chat.like.cn.core.util.Utils;
+import chat.like.cn.core.wraper.HttpMethodWrap;
 import chat.like.cn.serv.core.ChatServerBootStrap;
 import chat.like.cn.serv.core.ChatServerProps;
 import chat.like.cn.serv.core.HttpHandlerMapping;
 import chat.like.cn.serv.core.WebSocketListener;
 import chat.like.cn.serv.core.WebSocketListenerMapping;
+import cn.hutool.core.util.StrUtil;
 import io.smallrye.mutiny.Multi;
+import io.vertx.core.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
-import org.noear.solon.Solon;
-import org.noear.solon.SolonApp;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Init;
@@ -19,13 +21,14 @@ import org.noear.solon.annotation.Mapping;
 import org.noear.solon.annotation.ServerEndpoint;
 import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
-import org.noear.solon.core.Plugin;
-import org.noear.solon.core.PluginEntity;
-import org.noear.solon.core.wrap.MethodWrap;
+import org.noear.solon.core.handle.MethodTypeUtil;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.ArrayList;
 
 import static chat.like.cn.core.function.lang.*;
+import static chat.like.cn.core.solon.SolonUtil.addStopHook;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -48,7 +51,7 @@ public class ChatServSolonStarter {
                 .onItem().invoke(bs -> {
                     log.info("started in " + StopWatch.stop() + " ms. Listening on: " + ChatServerBootStrap.serverURL);
                     Aop.inject(bs);
-                    addStopHook(bs);
+                    addStopHook(bs::stop);
                 })
                 .await()
                 .atMost(Duration.ofSeconds(3));
@@ -61,7 +64,7 @@ public class ChatServSolonStarter {
                     final var serverEndpoint = beanWrap.annotationGet(ServerEndpoint.class);
                     log.info("WebSocket Endpoint Find: " + format("[ {}, Path: {} ]", beanWrap.clz(), defVal(serverEndpoint.value(), serverEndpoint.path())));
 
-                    return WebSocketListenerMapping.create(beanWrap.get(), serverEndpoint);
+                    return WebSocketListenerMapping.create(beanWrap.get(), initWsPath(serverEndpoint));
                 }).toList());
     }
 
@@ -74,9 +77,9 @@ public class ChatServSolonStarter {
 
                     log.info("Http Controller Find: " + format("[ {}, rootPath: {} ]", beanWrap.clz(), rootPath));
 
-                    return Utils.collectMethod(beanWrap.clz().getDeclaredMethods(), Utils.allHttpType())
-                            .stream().map(MethodWrap::get)
-                            .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap, rootPath));
+                    return Utils.collectMethod(beanWrap.clz().getDeclaredMethods(), Utils.allHttpType()).stream()
+                            .map(method -> initMethod(rootPath, method))
+                            .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap));
                 }).toList()));
     }
 
@@ -95,13 +98,26 @@ public class ChatServSolonStarter {
         return beanWrap.annotationGet(Controller.class) != null;
     }
 
-    private void addStopHook(final ChatServerBootStrap bs) {
-        Solon.cfg().plugs().add(new PluginEntity(new Plugin() {
-            @Override
-            public void start(final SolonApp app) { }
+    private HttpMethodWrap initMethod(String rootPath, Method method) {
+        if (!rootPath.endsWith("/")) {
+            rootPath = rootPath.concat("/");
+        }
+        var subPath = defVal(defVal(method.getAnnotation(Mapping.class).value(), method.getAnnotation(Mapping.class).path()), "");
+        if (subPath.startsWith("/")) {
+            subPath = subPath.substring(1);
+        }
+        return HttpMethodWrap.init(method, rootPath, initMethodType(method));
+    }
 
-            @Override
-            public void stop() throws Throwable { bs.stop(); }
-        }));
+    private HttpMethod initMethodType(Method method) {
+        return HttpMethod.valueOf(MethodTypeUtil.findAndFill(new ArrayList<>(), c -> method.getAnnotation(c) != null).stream().findFirst().orElseThrow(() -> Exc.chat(method.getName() + " 未识别出Http method Type")).name);
+    }
+
+    private String initWsPath(ServerEndpoint anno) {
+        final var path = defVal(anno.value(), anno.path());
+        if (StrUtil.isBlank(path)) {
+            throw Exc.chat("路径不能为空");
+        }
+        return path;
     }
 }

@@ -1,18 +1,9 @@
 package chat.like.cn.serv.core;
 
-import chat.like.cn.core.util.Exc;
-import io.vertx.core.http.HttpMethod;
+import chat.like.cn.core.wraper.HttpMethodWrap;
 import io.vertx.mutiny.ext.web.Router;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.noear.solon.annotation.Mapping;
-import org.noear.solon.core.handle.MethodType;
-import org.noear.solon.core.handle.MethodTypeUtil;
-import org.noear.solon.core.wrap.MethodWrap;
-
-import java.util.ArrayList;
-
-import static chat.like.cn.core.function.lang.*;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
@@ -22,15 +13,11 @@ import static chat.like.cn.core.function.lang.*;
 public class HttpHandlerMapping {
 
     public final Object source;
-    public final MethodWrap methodWrap;
-    public final String path;
-    private final MethodType httpMethodType;
+    public final HttpMethodWrap methodWrap;
 
-    private HttpHandlerMapping(final Object source, final MethodWrap methodWrap, final String rootPath) {
+    private HttpHandlerMapping(final Object source, final HttpMethodWrap methodWrap) {
         this.source = source;
         this.methodWrap = methodWrap;
-        this.path = initPath(rootPath);
-        this.httpMethodType = initMethodType(methodWrap);
     }
 
     /**
@@ -38,11 +25,10 @@ public class HttpHandlerMapping {
      *
      * @param source     当前http handler的原始对象
      * @param methodWrap 实际method的包装器
-     * @param rootPath   rootPath
      * @return {@link HttpHandlerMapping }
      */
-    public static HttpHandlerMapping create(Object source, MethodWrap methodWrap, final String rootPath) {
-        return new HttpHandlerMapping(source, methodWrap, rootPath);
+    public static HttpHandlerMapping create(Object source, HttpMethodWrap methodWrap) {
+        return new HttpHandlerMapping(source, methodWrap);
     }
 
     /**
@@ -51,8 +37,8 @@ public class HttpHandlerMapping {
      * @param router 路由器
      */
     public void attach(final Router router) {
-        log.info("Http Handler Registered: {}", this.path);
-        router.route(HttpMethod.valueOf(this.httpMethodType.name), this.path)
+        log.info("Http Handler Registered: {} {}", methodWrap.getHttpType(), this.methodWrap.getPath());
+        router.route(methodWrap.getHttpType(), this.methodWrap.getPath())
                 .handler(rCtx -> {
                     rCtx.json(this.invoke())
                             .subscribe().with(v -> {
@@ -64,20 +50,5 @@ public class HttpHandlerMapping {
     @SneakyThrows
     public Object invoke() {
         return this.methodWrap.invoke(source, null);
-    }
-
-    private String initPath(String rootPath) {
-        if (!rootPath.endsWith("/")) {
-            rootPath = rootPath.concat("/");
-        }
-        var subPath = defVal(defVal(this.methodWrap.getAnnotation(Mapping.class).value(), this.methodWrap.getAnnotation(Mapping.class).path()), "");
-        if (subPath.startsWith("/")) {
-            subPath = subPath.substring(1);
-        }
-        return rootPath + subPath;
-    }
-
-    private MethodType initMethodType(final MethodWrap methodWrap) {
-        return MethodTypeUtil.findAndFill(new ArrayList<>(), c -> methodWrap.getAnnotation(c) != null).stream().findFirst().orElseThrow(() -> Exc.chat(methodWrap.getName() + " 未识别出Http method Type"));
     }
 }
