@@ -49,7 +49,7 @@ public class ChatServSolonStarter {
         chatServerBootStrap = new ChatServerBootStrap(chatServerProps, collectHttp(), collectWs())
                 .start()
                 .onItem().invoke(bs -> {
-                    log.info("started in " + StopWatch.stop() + " ms. Listening on: " + ChatServerBootStrap.serverURL);
+                    log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + ChatServerBootStrap.serverURL);
                     Aop.inject(bs);
                 })
                 .await()

@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -95,14 +94,7 @@ public interface lang {
     /**
      * 格式化，占位符使用{}
      */
-    static String format(String template, Object... params) { return format(template, StrPool.EMPTY_JSON, params); }
-
-    /**
-     * 格式化，占位符使用bePlace
-     */
-    static String format(String template, String bePlace, Object... params) {
-        return StrUtil.format(template, bePlace, params);
-    }
+    static String format(String template, Object... params) { return StrUtil.format(template,params); }
 
     /**
      * 将 {@link Date} 转换为unix 时间戳
