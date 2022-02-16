@@ -110,7 +110,7 @@ public class ChatServSolonStarter {
         if (subPath.startsWith("/")) {
             subPath = subPath.substring(1);
         }
-        return HttpMethodWrap.init(method, rootPath, initMethodType(method));
+        return HttpMethodWrap.init(method, rootPath + subPath, initMethodType(method));
     }
 
     private HttpMethod initMethodType(Method method) {
