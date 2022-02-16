@@ -28,7 +28,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 
 import static chat.like.cn.core.function.lang.*;
-import static chat.like.cn.core.solon.SolonUtil.addStopHook;
+import static chat.like.cn.solon.SolonUtil.addStopHook;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>

@@ -1,4 +1,4 @@
-package chat.like.cn.core.solon;
+package chat.like.cn.solon;
 
 import org.noear.solon.Solon;
 import org.noear.solon.SolonApp;
