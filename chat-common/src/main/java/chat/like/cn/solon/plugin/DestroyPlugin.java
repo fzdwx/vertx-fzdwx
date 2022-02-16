@@ -1,5 +1,6 @@
 package chat.like.cn.solon.plugin;
 
+import chat.like.cn.core.function.lang;
 import chat.like.cn.solon.SolonUtil;
 import chat.like.cn.solon.annotation.Destroy;
 import org.noear.solon.SolonApp;
@@ -18,7 +19,7 @@ public class DestroyPlugin implements Plugin {
     public void start(final SolonApp app) {
         Aop.context().beanExtractorAdd(Destroy.class, (be, method, anno) -> {
             if (method.getParameters().length > 0) {
-                throw new IllegalArgumentException("@Destroy 注解不能支持参数注入");
+                throw new IllegalArgumentException(lang.format("@Destroy 注解不支持参数注入: {}", method.toString()));
             }
 
             SolonUtil.addStopHook(() -> {
