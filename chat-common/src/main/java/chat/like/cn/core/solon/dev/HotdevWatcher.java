@@ -1,4 +1,4 @@
-package chat.like.cn.core.dev;
+package chat.like.cn.core.solon.dev;
 
 import java.io.File;
 import java.util.Timer;

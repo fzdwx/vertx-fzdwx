@@ -1,4 +1,4 @@
-package chat.like.cn.core.dev;
+package chat.like.cn.core.solon.dev;
 
 import org.noear.solon.core.JarClassLoader;
 
