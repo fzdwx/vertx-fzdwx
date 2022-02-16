@@ -27,6 +27,7 @@ import org.noear.solon.core.handle.MethodTypeUtil;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 
 import static chat.like.cn.core.function.lang.*;
 
@@ -60,19 +61,19 @@ public class ChatServSolonStarter {
         chatServerBootStrap.stop();
     }
 
-    public Multi<WebSocketListenerMapping> collectWs() {
-        return Multi.createFrom().iterable(Aop.beanFind((ChatServSolonStarter::wxCondition))
+    public List<WebSocketListenerMapping> collectWs() {
+        return Aop.beanFind((ChatServSolonStarter::wxCondition))
                 .stream()
                 .map(beanWrap -> {
                     final var serverEndpoint = beanWrap.annotationGet(ServerEndpoint.class);
                     log.info("WebSocket Endpoint Find: " + format("[ {}, Path: {} ]", beanWrap.clz(), defVal(serverEndpoint.value(), serverEndpoint.path())));
 
                     return WebSocketListenerMapping.create(beanWrap.get(), initWsPath(serverEndpoint));
-                }).toList());
+                }).toList();
     }
 
-    public Multi<HttpHandlerMapping> collectHttp() {
-        return Multi.createFrom().iterable((Aop.beanFind((ChatServSolonStarter::httpCondition))
+    public List<HttpHandlerMapping> collectHttp() {
+        return Aop.beanFind((ChatServSolonStarter::httpCondition))
                 .stream()
                 .flatMap(beanWrap -> {
                     final var parentMapping = beanWrap.annotationGet(Mapping.class);
@@ -83,7 +84,7 @@ public class ChatServSolonStarter {
                     return Utils.collectMethod(beanWrap.clz().getDeclaredMethods(), Utils.allHttpType()).stream()
                             .map(method -> initMethod(rootPath, method))
                             .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap));
-                }).toList()));
+                }).toList();
     }
 
     private static boolean wxCondition(final BeanWrap beanWrap) {

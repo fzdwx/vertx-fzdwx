@@ -19,22 +19,23 @@ public class WebSocketListenerMapping {
      */
     private final String path;
 
-    private WebSocketListenerMapping(final WebSocketListener webSocketListener,String path) {
+    private WebSocketListenerMapping(final WebSocketListener webSocketListener, String path) {
         this.source = webSocketListener;
         this.path = path;
     }
 
-    public static WebSocketListenerMapping create(WebSocketListener source,String path) {
-        return new WebSocketListenerMapping(source,path);
+    public static WebSocketListenerMapping create(WebSocketListener source, String path) {
+        return new WebSocketListenerMapping(source, path);
     }
 
     /**
      * 将当前websocket请求处理器挂载到router上
      *
-     * @param router router
+     * @param router    router
+     * @param firstFlag
      */
-    public void attach(final Router router) {
-        log.info("WebSocket Endpoint Registered: " + path);
+    public void attach(final Router router, final Boolean firstFlag) {
+        if (firstFlag) log.info("WebSocket Endpoint Registered: " + path);
 
         router.get(path)
                 .handler(ctx -> {

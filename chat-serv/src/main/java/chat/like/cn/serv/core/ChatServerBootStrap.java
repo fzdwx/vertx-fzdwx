@@ -1,10 +1,11 @@
 package chat.like.cn.serv.core;
 
 import chat.like.cn.serv.constants.SharDataCons;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -14,12 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatServerBootStrap {
 
     public static ChatServerProps chatServerProps;
-    public static Multi<HttpHandlerMapping> httpHandlerSup;
-    public static Multi<WebSocketListenerMapping> websocketSup;
+    public static List<HttpHandlerMapping> httpHandlerSup;
+    public static List<WebSocketListenerMapping> websocketSup;
     private final Vertx vertx;
 
-    public ChatServerBootStrap(final ChatServerProps chatServerProps, final Multi<HttpHandlerMapping> httpHandlerSup,
-                               final Multi<WebSocketListenerMapping> websocketSup) {
+    public ChatServerBootStrap(final ChatServerProps chatServerProps, final List<HttpHandlerMapping> httpHandlerSup,
+                               final List<WebSocketListenerMapping> websocketSup) {
         this.vertx = Vertx.vertx(chatServerProps.getVertxOps());
         SharDataCons.vertx = vertx;
         vertx.sharedData().getAsyncMap(SharDataCons.INIT_VERTX_MAp).onItem()
