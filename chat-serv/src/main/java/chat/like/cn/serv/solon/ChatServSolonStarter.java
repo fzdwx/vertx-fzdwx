@@ -49,18 +49,18 @@ public class ChatServSolonStarter {
     }
 
     public Multi<WebSocketListenerMapping> collectWs() {
-        return Multi.createFrom().items(() -> Aop.beanFind((ChatServSolonStarter::wxCondition))
+        return Multi.createFrom().iterable(Aop.beanFind((ChatServSolonStarter::wxCondition))
                 .stream()
                 .map(beanWrap -> {
                     final var serverEndpoint = beanWrap.annotationGet(ServerEndpoint.class);
                     log.info("WebSocket Endpoint Find: " + format("[ {}, Path: {} ]", beanWrap.clz(), defVal(serverEndpoint.value(), serverEndpoint.path())));
 
                     return WebSocketListenerMapping.create(beanWrap.get(), serverEndpoint);
-                }));
+                }).toList());
     }
 
     public Multi<HttpHandlerMapping> collectHttp() {
-        return Multi.createFrom().items(() -> Aop.beanFind((ChatServSolonStarter::httpCondition))
+        return Multi.createFrom().iterable((Aop.beanFind((ChatServSolonStarter::httpCondition))
                 .stream()
                 .flatMap(beanWrap -> {
                     final var parentMapping = beanWrap.annotationGet(Mapping.class);
@@ -71,7 +71,7 @@ public class ChatServSolonStarter {
                     return Utils.collectMethod(beanWrap.clz().getDeclaredMethods(), Utils.allHttpType())
                             .stream().map(MethodWrap::get)
                             .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap, rootPath));
-                }));
+                }).toList()));
     }
 
     private static boolean wxCondition(final BeanWrap beanWrap) {

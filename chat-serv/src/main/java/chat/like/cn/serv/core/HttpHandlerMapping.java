@@ -54,7 +54,10 @@ public class HttpHandlerMapping {
         log.info("Http Handler Registered: {}", this.path);
         router.route(HttpMethod.valueOf(this.httpMethodType.name), this.path)
                 .handler(rCtx -> {
-                    rCtx.json(this.invoke()).onItem();
+                    rCtx.json(this.invoke())
+                            .subscribe().with(v -> {
+                                rCtx.end().subscribe();
+                            });
                 });
     }
 

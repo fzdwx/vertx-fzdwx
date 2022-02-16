@@ -44,6 +44,8 @@ public class WebSocketListenerMapping {
      * @param router router
      */
     public void attach(final Router router) {
+        log.info("WebSocket Endpoint Registered: " + path);
+
         router.get(path)
                 .handler(ctx -> {
                     ctx.request().toWebSocket()

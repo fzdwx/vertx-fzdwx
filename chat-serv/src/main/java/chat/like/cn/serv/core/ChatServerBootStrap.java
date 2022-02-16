@@ -35,7 +35,6 @@ public class ChatServerBootStrap {
     public Uni<ChatServerBootStrap> start() {
         synchronized (this) {
             if (!startedFlag) {
-
                 return vertx.createHttpServer()
                         // .exceptionHandler(ex -> {
                         //     log.error("", ex.getCause());
@@ -48,7 +47,7 @@ public class ChatServerBootStrap {
                             startedFlag = Boolean.TRUE;
                         })
                         .onFailure().invoke(thr -> {
-                            log.error("started fail ", thr.getCause());
+                            log.error("started fail {}", thr.getMessage());
                             System.exit(1);
                         })
                         .replaceWith(Uni.createFrom().item(() -> this));
@@ -57,12 +56,17 @@ public class ChatServerBootStrap {
     }
 
     private void initWsHandler(final Multi<WebSocketListenerMapping> websocketSup) {
-        websocketSup.onItem().invoke(w -> { w.attach(router); })
-                .subscribe();
+        // TODO: 2022/2/16 有问题
+        websocketSup.subscribe()
+                .asIterable().forEach(w -> {
+                    w.attach(router);
+                });
     }
 
     private void initHttpHandler(final Multi<HttpHandlerMapping> httpHandlerSup) {
-        httpHandlerSup.onItem().invoke(h -> { h.attach(router); })
-                .subscribe();
+        httpHandlerSup.subscribe()
+                .asIterable().forEach(w -> {
+                    w.attach(router);
+                });
     }
 }
