@@ -1,7 +1,7 @@
 package chat.like.cn.serv.core;
 
 import chat.like.cn.core.util.Exc;
-import chat.like.cn.core.util.Func;
+import chat.like.cn.core.util.lang;
 import cn.hutool.core.util.StrUtil;
 import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +99,7 @@ public class WebSocketListenerMapping {
     }
 
     private String initPath() {
-        final var path = Func.defVal(anno.value(), anno.path());
+        final var path = lang.defVal(anno.value(), anno.path());
         if (StrUtil.isBlank(path)) {
             throw Exc.chat("路径不能为空");
         }

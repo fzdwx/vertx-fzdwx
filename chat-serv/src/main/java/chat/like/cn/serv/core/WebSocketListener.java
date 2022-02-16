@@ -3,7 +3,7 @@ package chat.like.cn.serv.core;
 import chat.like.cn.core.function.tuple.Tuple;
 import chat.like.cn.core.function.tuple.Tuple2;
 import chat.like.cn.core.util.Exc;
-import chat.like.cn.core.util.Func;
+import chat.like.cn.core.util.lang;
 import chat.like.cn.core.util.Print;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -21,14 +21,14 @@ import io.vertx.core.http.WebSocketFrame;
  */
 public interface WebSocketListener {
 
-    Tuple2<Boolean, Exception> handShakeSuccess = Tuple.t2(Boolean.TRUE, null);
-    Tuple2<Boolean, Exception> handShakeFail = Tuple.t2(Boolean.FALSE, Exc.chat("握手失败"));
+    Tuple2<Boolean, Exception> handShakeSuccess = Tuple.of(Boolean.TRUE, null);
+    Tuple2<Boolean, Exception> handShakeFail = Tuple.of(Boolean.FALSE, Exc.chat("握手失败"));
 
     /**
      * webSocket 握手请求
      *
      * @param headers 请求头
-     * @return {@link Tuple2<Boolean, String> }
+     * @return {@link Tuple2 <Boolean, String> }
      * @apiNote <pre>
      *     boolean: 表示当前请求是否成功
      *     exception: 表示失败要发送给客户端的信息(只有当失败时才会被处理)
@@ -107,7 +107,7 @@ public interface WebSocketListener {
         final var res = onHandShake(headers);
 
         if (res == null || res.t1 == Boolean.FALSE)
-            resultHandler.handle(Future.failedFuture(Func.defVal(res, handShakeFail).t2));
+            resultHandler.handle(Future.failedFuture(lang.defVal(res, handShakeFail).t2));
         else
             resultHandler.handle(Future.succeededFuture());
     }

@@ -21,9 +21,9 @@ import org.noear.solon.core.wrap.MethodWrap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static chat.like.cn.core.util.Func.contains;
-import static chat.like.cn.core.util.Func.defVal;
-import static chat.like.cn.core.util.Func.format;
+import static chat.like.cn.core.util.lang.contains;
+import static chat.like.cn.core.util.lang.defVal;
+import static chat.like.cn.core.util.lang.format;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>

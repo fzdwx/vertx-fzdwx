@@ -12,7 +12,7 @@ import org.noear.solon.core.wrap.MethodWrap;
 
 import java.util.ArrayList;
 
-import static chat.like.cn.core.util.Func.defVal;
+import static chat.like.cn.core.util.lang.defVal;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
