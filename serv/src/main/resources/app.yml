@@ -3,8 +3,8 @@ solon.app:
 chat.serv:
   port: 11111
 #  workerPoolSize: 100
-#  eventLoopPoolSize: 100
-#  deployInstances: 16
+  eventLoopPoolSize: 100
+  deployInstances: 100
 
 # solon log
 solon.logging.appender:

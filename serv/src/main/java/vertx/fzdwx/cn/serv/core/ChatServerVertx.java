@@ -48,9 +48,10 @@ public class ChatServerVertx extends Verticle {
                 // })
                 .requestHandler(router)
                 .listen(chatServerProps.getPort(), res -> {
-                    if (res.succeeded())
+                    if (res.succeeded()) {
+                        chatServer = res.result();
                         startPromise.complete();
-                    else startPromise.fail(res.cause());
+                    } else startPromise.fail(res.cause());
                 });
     }
 

@@ -59,7 +59,7 @@ public class ChatServSolonStarter {
 
         verticleBootStrap = new VerticleBootStrap(chatServerProps, collectHttp(), collectWs());
         verticleBootStrap.deploy()
-                .onSuccess(deployId -> {
+                .onComplete(res -> {
                     log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
                 });
     }
