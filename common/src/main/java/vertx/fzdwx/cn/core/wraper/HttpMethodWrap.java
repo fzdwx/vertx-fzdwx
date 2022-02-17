@@ -22,7 +22,7 @@ public class HttpMethodWrap {
     public HttpMethodWrap(final Method m, final String rootPath, final String subPath, final HttpMethod httpMethod) {
         this.method = m;
         this.rootPath = rootPath;
-        this.subPath= subPath;
+        this.subPath = subPath;
         this.httpMethod = httpMethod;
         this.parameters = paramsWrap(m.getParameters());
         this.annotations = m.getAnnotations();
@@ -34,7 +34,7 @@ public class HttpMethodWrap {
             synchronized (method) {
                 mw = cached.get(method);
                 if (mw == null) {
-                    mw = new HttpMethodWrap(method, rootPath,subPath, httpMethod);
+                    mw = new HttpMethodWrap(method, rootPath, subPath, httpMethod);
                     cached.put(method, mw);
                 }
             }
@@ -80,7 +80,7 @@ public class HttpMethodWrap {
         return this.rootPath;
     }
 
-    public String getSubPath(){ return this.subPath;}
+    public String getSubPath() { return this.subPath; }
 
     public HttpMethod getHttpType() {
         return this.httpMethod;
@@ -124,7 +124,7 @@ public class HttpMethodWrap {
     /**
      * 执行
      */
-    public Object invoke(Object obj, Object[] args) throws Exception {
+    public Object invoke(Object obj, Object... args) throws Exception {
         try {
             return method.invoke(obj, args);
         } catch (InvocationTargetException e) {

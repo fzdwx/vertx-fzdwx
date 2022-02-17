@@ -3,10 +3,10 @@ package vertx.fzdwx.cn.serv.core;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.mutiny.core.MultiMap;
-import io.vertx.mutiny.core.buffer.Buffer;
-import io.vertx.mutiny.core.http.ServerWebSocket;
-import io.vertx.mutiny.core.http.WebSocketFrame;
+import io.vertx.core.MultiMap;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.http.WebSocketFrame;
 import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.function.tuple.Tuple;
 import vertx.fzdwx.cn.core.function.tuple.Tuple2;
@@ -90,7 +90,7 @@ public interface WebSocketListener {
      * @param buf 数据帧
      */
     default void handlePong(final ServerWebSocket ws, Buffer buf) {
-        ws.writeFrame(WebSocketFrame.pingFrame(Buffer.buffer("PING"))).subscribe();
+        ws.writeFrame(WebSocketFrame.pingFrame(Buffer.buffer("PING")));
     }
 
     /**
@@ -100,7 +100,7 @@ public interface WebSocketListener {
      * @param frame 数据帧
      */
     default void handlePing(final ServerWebSocket ws, WebSocketFrame frame) {
-        ws.writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG"))).subscribe();
+        ws.writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG")));
     }
 
     default void doOnHandShake(MultiMap headers, Handler<AsyncResult<Integer>> resultHandler) {

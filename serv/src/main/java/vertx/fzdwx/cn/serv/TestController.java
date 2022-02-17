@@ -1,10 +1,14 @@
 package vertx.fzdwx.cn.serv;
 
+import io.vertx.ext.web.RoutingContext;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Get;
 import org.noear.solon.annotation.Mapping;
+import vertx.fzdwx.cn.core.annotation.Param;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -17,9 +21,9 @@ public class TestController {
 
     @SneakyThrows
     @Get
-    @Mapping("/hello")
-    public String hello() {
+    @Mapping("/hello/:id/:name")
+    public Map<String, String> hello(RoutingContext context, @Param("id") int id, @Param("name") String name) {
         log.info("invoke");
-        return "key:" + "helloworld1231231";
+        return Map.of("hello", "world");
     }
 }

@@ -1,7 +1,7 @@
 package vertx.fzdwx.cn.serv.core;
 
-import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.core.Vertx;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -21,10 +21,11 @@ public class VerticleBootStrap {
     private static List<WebSocketListenerMapping> webSocketListenerMappings;
     private static Vertx vertx;
 
-    public VerticleBootStrap(final ChatServerProps chatServerProps, final List<HttpHandlerMapping> httpHandlerMappings,
-                             final List<WebSocketListenerMapping> webSocketListenerMappings) {
+    public VerticleBootStrap(
+            final ChatServerProps chatServerProps,
+            final List<HttpHandlerMapping> httpHandlerMappings,
+            final List<WebSocketListenerMapping> webSocketListenerMappings) {
         vertx = Vertx.vertx(chatServerProps.getVertxOps());
-
         VerticleBootStrap.chatServerProps = chatServerProps;
         VerticleBootStrap.httpHandlerMappings = httpHandlerMappings;
         VerticleBootStrap.webSocketListenerMappings = webSocketListenerMappings;
@@ -41,13 +42,13 @@ public class VerticleBootStrap {
     /**
      * 部署
      *
-     * @return {@link Uni<String> }
+     * @return {@link String }
      */
-    public Uni<String> deploy() {
+    public Future<String> deploy() {
         return vertx.deployVerticle("vertx.fzdwx.cn.serv.core.ChatServerVertx", chatServerProps.getDeployOps());
     }
 
     public void stop() {
-        vertx.closeAndAwait();
+        vertx.close();
     }
 }

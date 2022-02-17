@@ -1,8 +1,8 @@
 package vertx.fzdwx.cn.serv.core;
 
-import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.core.http.HttpServer;
-import io.vertx.mutiny.ext.web.Router;
+import io.vertx.core.Future;
+import io.vertx.core.http.HttpServer;
+import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 import vertx.fzdwx.cn.core.function.lang;
 
@@ -30,21 +30,18 @@ public class ChatServerVertx extends Verticle {
     }
 
     @Override
-    protected Uni<Void> init() {
-        return Uni.createFrom().item(() -> {
-            chatServerProps = (ChatServerProps) VerticleBootStrap.map.get("chatServerProps");
-            httpHandlerMappings = (List<HttpHandlerMapping>) VerticleBootStrap.map.get("httpHandlerMappings");
-            webSocketListenerMappings = (List<WebSocketListenerMapping>) VerticleBootStrap.map.get("webSocketListenerMappings");
-            return null;
-        }).replaceWithVoid();
+    protected void init() {
+        chatServerProps = (ChatServerProps) VerticleBootStrap.map.get("chatServerProps");
+        httpHandlerMappings = (List<HttpHandlerMapping>) VerticleBootStrap.map.get("httpHandlerMappings");
+        webSocketListenerMappings = (List<WebSocketListenerMapping>) VerticleBootStrap.map.get("webSocketListenerMappings");
     }
 
     @Override
-    public Uni<Void> asyncStart() {
-        return this.start0().replaceWithVoid();
+    public Future<?> asyncStart() {
+        return this.start0();
     }
 
-    public Uni<ChatServerVertx> start0() {
+    public Future<ChatServerVertx> start0() {
         this.router = Router.router(vertx);
         initWsHandler(webSocketListenerMappings);
         initHttpHandler(httpHandlerMappings);
@@ -55,14 +52,7 @@ public class ChatServerVertx extends Verticle {
                 // })
                 .requestHandler(router)
                 .listen(chatServerProps.getPort())
-                .onItem().invoke(h -> {
-                    chatServer = h;
-                })
-                .onFailure().invoke(thr -> {
-                    log.error("started fail {}", thr.getMessage());
-                    System.exit(1);
-                })
-                .replaceWith(Uni.createFrom().item(() -> this));
+                .map(this);
     }
 
     private void initWsHandler(final List<WebSocketListenerMapping> websocketSup) {

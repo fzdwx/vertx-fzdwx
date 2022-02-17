@@ -1,9 +1,9 @@
 package vertx.fzdwx.cn.serv.core;
 
-import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.vertx.core.AbstractVerticle;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.mutiny.core.Vertx;
+import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,8 +21,9 @@ public abstract class Verticle extends AbstractVerticle {
     public void start(final Promise<Void> startPromise) throws Exception {
         if (first()) {
             log.info("deploy init invoke");
-            init().await().indefinitely();
+            init();
         }
+        asyncStart();
         super.start(startPromise);
     }
 
@@ -43,11 +44,8 @@ public abstract class Verticle extends AbstractVerticle {
 
     /**
      * 初始化,只会执行一次
-     *
-     * @return {@link Uni<Void> }
      */
-    protected abstract Uni<Void> init();
+    protected abstract void init();
 
-    @Override
-    public abstract Uni<Void> asyncStart();
+    public abstract Future<?> asyncStart();
 }

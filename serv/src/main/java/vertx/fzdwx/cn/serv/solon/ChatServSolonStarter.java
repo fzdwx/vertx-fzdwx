@@ -13,6 +13,7 @@ import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.handle.MethodTypeUtil;
 import vertx.fzdwx.cn.core.annotation.Destroy;
+import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.util.Exc;
 import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
@@ -22,11 +23,16 @@ import vertx.fzdwx.cn.serv.core.HttpHandlerMapping;
 import vertx.fzdwx.cn.serv.core.VerticleBootStrap;
 import vertx.fzdwx.cn.serv.core.WebSocketListener;
 import vertx.fzdwx.cn.serv.core.WebSocketListenerMapping;
+import vertx.fzdwx.cn.serv.core.parser.HttpArgumentParser;
+import vertx.fzdwx.cn.serv.solon.parser.ParamParser;
+import vertx.fzdwx.cn.serv.solon.parser.RoutingContextParser;
 
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static vertx.fzdwx.cn.core.function.lang.contains;
 import static vertx.fzdwx.cn.core.function.lang.defVal;
@@ -43,6 +49,8 @@ public class ChatServSolonStarter {
     @Inject("${chat.serv}")
     private ChatServerProps chatServerProps;
     private VerticleBootStrap verticleBootStrap;
+    final Map<String, HttpArgumentParser> parsers = lang.<HttpArgumentParser>listOf(new ParamParser(), new RoutingContextParser()).
+            stream().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
 
     // vertx.deployVerticle(chatServerProps.getAppName() + "-vert.x", chatServerProps.getDeployOps()).await().indefinitely();
     @Init
@@ -51,10 +59,9 @@ public class ChatServSolonStarter {
 
         verticleBootStrap = new VerticleBootStrap(chatServerProps, collectHttp(), collectWs());
         verticleBootStrap.deploy()
-                .onItem().invoke(() -> {
+                .onSuccess(deployId -> {
                     log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
-                    // Aop.inject(bs);
-                }).await().atMost(Duration.ofSeconds(10));
+                });
     }
 
     @Destroy
@@ -83,8 +90,15 @@ public class ChatServSolonStarter {
                     log.info("Http Controller Find: " + format("[ {}, rootPath: {} ]", beanWrap.clz(), rootPath));
 
                     return Utils.collectMethod(beanWrap.clz().getDeclaredMethods(), Utils.allHttpType()).stream()
-                            .map(method -> initMethod(rootPath, method))
-                            .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap));
+                            .map(method -> {
+                                // TODO: 2022/2/17 限定 controller 返回类型
+                                // final var typeName = method.getGenericReturnType().getTypeName();
+                                // if (!(StrUtil.contains(typeName, "io.smallrye.mutiny.Uni") || StrUtil.contains(typeName, "io.smallrye.mutiny.Multi"))) {
+                                //     throw new IllegalArgumentException(format("方法返回值只能为uni 或者 multi => {}", method.toString()));
+                                // }
+                                return initMethod(rootPath, method);
+                            })
+                            .map(methodWrap -> HttpHandlerMapping.create(beanWrap.get(), methodWrap, parsers));
                 }).toList();
     }
 

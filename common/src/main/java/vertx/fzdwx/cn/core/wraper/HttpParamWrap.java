@@ -1,10 +1,10 @@
 package vertx.fzdwx.cn.core.wraper;
 
-import org.noear.solon.Utils;
-import org.noear.solon.annotation.Body;
-import org.noear.solon.annotation.Param;
-import org.noear.solon.core.Constants;
 
+import vertx.fzdwx.cn.core.annotation.Body;
+import vertx.fzdwx.cn.core.annotation.Param;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -16,28 +16,19 @@ public class HttpParamWrap {
 
     private final Parameter parameter;
     private String name;
-    private String defaultValue;
     private boolean required;
     private boolean requireBody;
     private ParameterizedType genericType;
+    private Annotation[] annotations;
 
     public HttpParamWrap(Parameter parameter) {
         this.parameter = parameter;
-        this.name = parameter.getName();
 
         Param paramAnno = parameter.getAnnotation(Param.class);
         Body bodyAnno = parameter.getAnnotation(Body.class);
 
         if (paramAnno != null) {
-            String name2 = Utils.annoAlias(paramAnno.value(), paramAnno.name());
-            if (Utils.isNotEmpty(name2)) {
-                name = name2;
-            }
-
-            if (Constants.PARM_UNDEFINED_VALUE.equals(paramAnno.defaultValue()) == false) {
-                defaultValue = paramAnno.defaultValue();
-            }
-
+            this.name = paramAnno.value();
             required = paramAnno.required();
         }
 
@@ -51,10 +42,15 @@ public class HttpParamWrap {
         } else {
             genericType = null;
         }
+        this.annotations = parameter.getAnnotations();
     }
 
     public Parameter getParameter() {
         return parameter;
+    }
+
+    public Annotation[] annotations() {
+        return annotations;
     }
 
     public String getName() {
@@ -76,9 +72,4 @@ public class HttpParamWrap {
     public boolean requireBody() {
         return requireBody;
     }
-
-    public String defaultValue() {
-        return defaultValue;
-    }
-
 }

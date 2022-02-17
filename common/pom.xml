@@ -25,13 +25,9 @@
             <groupId>org.noear</groupId>
             <artifactId>logback-solon-plugin</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.vertx</groupId>-->
-<!--            <artifactId>vertx-web</artifactId>-->
-<!--        </dependency>-->
         <dependency>
-            <groupId>io.smallrye.reactive</groupId>
-            <artifactId>smallrye-mutiny-vertx-core</artifactId>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>

@@ -1,6 +1,6 @@
 package vertx.fzdwx.cn.serv.core;
 
-import io.vertx.mutiny.ext.web.Router;
+import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,7 +32,7 @@ public class WebSocketListenerMapping {
      * 将当前websocket请求处理器挂载到router上
      *
      * @param router    router
-     * @param firstFlag
+     * @param firstFlag 是否为第一次启动
      */
     public void attach(final Router router, final Boolean firstFlag) {
         if (firstFlag) log.info("WebSocket Endpoint Registered: " + path);
@@ -40,10 +40,9 @@ public class WebSocketListenerMapping {
         router.get(path)
                 .handler(ctx -> {
                     ctx.request().toWebSocket()
-                            .onItem()
-                            .invoke(ws -> {
+                            .onSuccess(ws -> {
                                 // onClose
-                                ws.closeHandler(() -> {
+                                ws.closeHandler(v -> {
                                     source.onclose(ws);
                                 });
 
@@ -51,9 +50,7 @@ public class WebSocketListenerMapping {
                                 source.doOnHandShake(ws.headers(), ar -> {
                                     if (ar.failed()) {
                                         ws.writeTextMessage(ar.cause().getMessage())
-                                                .onTermination()
-                                                .invoke(ws::close)
-                                                .subscribe();
+                                                .onComplete(res -> ws.close());
                                     }
                                 });
                                 //endregion
@@ -87,10 +84,10 @@ public class WebSocketListenerMapping {
                                 });
 
                                 // 在onClose后执行  todo 是否要加入webSocketListener中？
-                                ws.endHandler(() -> {
+                                ws.endHandler(v -> {
                                     log.info("Websocket Stream End");
                                 });
-                            }).subscribe();
+                            });
                 });
     }
 }
