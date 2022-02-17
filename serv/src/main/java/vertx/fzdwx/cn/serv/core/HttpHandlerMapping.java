@@ -58,7 +58,9 @@ public class HttpHandlerMapping {
         router.route(methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath())
                 .handler(rtx -> {
                     final var result = this.invoke(rtx);
-                    rtx.json(result);
+                    if (!methodWrap.getReturnType().getName().equals("void")) {
+                        rtx.json(result);
+                    }
                 });
     }
 
