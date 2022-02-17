@@ -1,9 +1,9 @@
 package vertx.fzdwx.cn.serv.core;
 
-import vertx-fzdwx.cn.serv.constants.SharDataCons;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+import vertx.fzdwx.cn.serv.constants.SharDataCons;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class ChatServerBootStrap {
     }
 
     public Uni<String> start() {
-        return vertx.deployVerticle("vertx-fzdwx.cn.serv.core.ChatServerVertx", chatServerProps.getDeployOps());
+        return vertx.deployVerticle("vertx.fzdwx.cn.serv.core.ChatServerVertx", chatServerProps.getDeployOps());
     }
 
     public void stop() {
