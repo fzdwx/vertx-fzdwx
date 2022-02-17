@@ -1,7 +1,6 @@
 package vertx.fzdwx.cn.serv.core;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,7 @@ public abstract class Verticle extends AbstractVerticle {
             log.info("deploy init invoke");
             init();
         }
-        asyncStart();
-        super.start(startPromise);
+        start0(startPromise);
     }
 
     /**
@@ -47,5 +45,5 @@ public abstract class Verticle extends AbstractVerticle {
      */
     protected abstract void init();
 
-    public abstract Future<?> asyncStart();
+    public abstract void start0(final Promise<Void> startPromise);
 }

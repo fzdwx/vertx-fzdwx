@@ -1,6 +1,6 @@
 package vertx.fzdwx.cn.serv.core;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
@@ -37,22 +37,21 @@ public class ChatServerVertx extends Verticle {
     }
 
     @Override
-    public Future<?> asyncStart() {
-        return this.start0();
-    }
-
-    public Future<ChatServerVertx> start0() {
+    public void start0(final Promise<Void> startPromise) {
         this.router = Router.router(vertx);
         initWsHandler(webSocketListenerMappings);
         initHttpHandler(httpHandlerMappings);
 
-        return vertx.createHttpServer()
+        vertx.createHttpServer()
                 // .exceptionHandler(ex -> {
                 //     log.error("", ex.getCause());
                 // })
                 .requestHandler(router)
-                .listen(chatServerProps.getPort())
-                .map(this);
+                .listen(chatServerProps.getPort(), res -> {
+                    if (res.succeeded())
+                        startPromise.complete();
+                    else startPromise.fail(res.cause());
+                });
     }
 
     private void initWsHandler(final List<WebSocketListenerMapping> websocketSup) {

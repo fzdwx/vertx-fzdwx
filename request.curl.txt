@@ -1,2 +1,2 @@
-curl --location --request GET 'http://localhost:11111/qweqwe/hello' \
+curl --location --request GET 'http://localhost:11111/qweqwe/hello/444/like' \
 --header 'Content-Type: application/json'
