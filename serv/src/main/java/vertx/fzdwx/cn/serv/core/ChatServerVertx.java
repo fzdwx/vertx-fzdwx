@@ -1,43 +1,50 @@
 package vertx.fzdwx.cn.serv.core;
 
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
 import io.vertx.mutiny.core.http.HttpServer;
 import io.vertx.mutiny.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
  * @date 2022/2/16 17:52
  */
 @Slf4j
-public class ChatServerVertx extends AbstractVerticle {
+public class ChatServerVertx extends Verticle {
 
     public HttpServer chatServer;
     private Router router;
-    private ChatServerProps chatServerProps = ChatServerBootStrap.chatServerProps;
-    private List<HttpHandlerMapping> httpHandlerSup = ChatServerBootStrap.httpHandlerSup;
-    private List<WebSocketListenerMapping> websocketSup = ChatServerBootStrap.websocketSup;
-    private volatile static Boolean firstFlag = Boolean.TRUE;
+    private static ChatServerProps chatServerProps;
+    private static List<HttpHandlerMapping> httpHandlerMappings;
+    private static List<WebSocketListenerMapping> webSocketListenerMappings;
+
+    @Override
+    protected boolean first() {
+        return first;
+    }
+
+    @Override
+    protected Uni<Void> init() {
+        return Uni.createFrom().item(() -> {
+            chatServerProps = (ChatServerProps) VerticleBootStrap.map.get("chatServerProps");
+            httpHandlerMappings = (List<HttpHandlerMapping>) VerticleBootStrap.map.get("httpHandlerMappings");
+            webSocketListenerMappings = (List<WebSocketListenerMapping>) VerticleBootStrap.map.get("webSocketListenerMappings");
+            return null;
+        }).replaceWithVoid();
+    }
 
     @Override
     public Uni<Void> asyncStart() {
         return this.start0().replaceWithVoid();
     }
 
-    @Override
-    public void start(final Promise<Void> startPromise) throws Exception {
-        if (firstFlag == Boolean.TRUE) firstFlag = Boolean.FALSE;
-        super.start(startPromise);
-    }
-
     public Uni<ChatServerVertx> start0() {
         this.router = Router.router(vertx);
-        initWsHandler(websocketSup);
-        initHttpHandler(httpHandlerSup);
+        initWsHandler(webSocketListenerMappings);
+        initHttpHandler(httpHandlerMappings);
 
         return vertx.createHttpServer()
                 // .exceptionHandler(ex -> {
@@ -57,13 +64,20 @@ public class ChatServerVertx extends AbstractVerticle {
 
     private void initWsHandler(final List<WebSocketListenerMapping> websocketSup) {
         websocketSup.forEach(w -> {
-            w.attach(router, firstFlag);
+            w.attach(router, first);
         });
     }
 
     private void initHttpHandler(final List<HttpHandlerMapping> httpHandlerSup) {
         httpHandlerSup.forEach(w -> {
-            w.attach(router, firstFlag);
+            w.attach(router, first);
         });
+    }
+
+    private static AtomicInteger instanceCount = new AtomicInteger(0);
+    private final boolean first;
+    {
+        int number = instanceCount.getAndIncrement();
+        first = number == 1;
     }
 }

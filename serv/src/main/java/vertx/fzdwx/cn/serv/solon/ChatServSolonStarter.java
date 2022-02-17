@@ -16,12 +16,12 @@ import vertx.fzdwx.cn.core.util.Exc;
 import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
 import vertx.fzdwx.cn.core.wraper.HttpMethodWrap;
-import vertx.fzdwx.cn.serv.core.ChatServerBootStrap;
+import vertx.fzdwx.cn.serv.core.VerticleBootStrap;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
 import vertx.fzdwx.cn.serv.core.HttpHandlerMapping;
 import vertx.fzdwx.cn.serv.core.WebSocketListener;
 import vertx.fzdwx.cn.serv.core.WebSocketListenerMapping;
-import vertx.fzdwx.cn.solon.annotation.Destroy;
+import vertx.fzdwx.cn.core.annotation.Destroy;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -40,15 +40,15 @@ public class ChatServSolonStarter {
 
     @Inject("${chat.serv}")
     private ChatServerProps chatServerProps;
-    private ChatServerBootStrap chatServerBootStrap;
+    private VerticleBootStrap verticleBootStrap;
 
     // vertx.deployVerticle(chatServerProps.getAppName() + "-vert.x", chatServerProps.getDeployOps()).await().indefinitely();
     @Init
     public void init() {
         StopWatch.start();
 
-        chatServerBootStrap = new ChatServerBootStrap(chatServerProps, collectHttp(), collectWs());
-        chatServerBootStrap.start()
+        verticleBootStrap = new VerticleBootStrap(chatServerProps, collectHttp(), collectWs());
+        verticleBootStrap.deploy()
                 .onItem().invoke(() -> {
                     log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
                     // Aop.inject(bs);
@@ -57,7 +57,7 @@ public class ChatServSolonStarter {
 
     @Destroy
     public void destroy() {
-        chatServerBootStrap.stop();
+        verticleBootStrap.stop();
     }
 
     public List<WebSocketListenerMapping> collectWs() {

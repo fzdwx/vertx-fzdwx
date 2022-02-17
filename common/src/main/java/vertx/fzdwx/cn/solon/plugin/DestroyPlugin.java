@@ -4,7 +4,7 @@ import org.noear.solon.SolonApp;
 import org.noear.solon.core.Aop;
 import org.noear.solon.core.Plugin;
 import vertx.fzdwx.cn.core.function.lang;
-import vertx.fzdwx.cn.solon.annotation.Destroy;
+import vertx.fzdwx.cn.core.annotation.Destroy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

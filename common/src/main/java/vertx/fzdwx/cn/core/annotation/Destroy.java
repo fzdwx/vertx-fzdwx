@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn.solon.annotation;
+package vertx.fzdwx.cn.core.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
