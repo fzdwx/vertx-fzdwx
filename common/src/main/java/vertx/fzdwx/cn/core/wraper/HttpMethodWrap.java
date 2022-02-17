@@ -19,21 +19,22 @@ public class HttpMethodWrap {
 
     private static Map<Method, HttpMethodWrap> cached = new HashMap<>();
 
-    public HttpMethodWrap(final Method m, final String path, final HttpMethod httpMethod) {
+    public HttpMethodWrap(final Method m, final String rootPath, final String subPath, final HttpMethod httpMethod) {
         this.method = m;
-        this.path = path;
+        this.rootPath = rootPath;
+        this.subPath= subPath;
         this.httpMethod = httpMethod;
         this.parameters = paramsWrap(m.getParameters());
         this.annotations = m.getAnnotations();
     }
 
-    public static HttpMethodWrap init(Method method, final String path, final HttpMethod httpMethod) {
+    public static HttpMethodWrap init(Method method, final String rootPath, final String subPath, final HttpMethod httpMethod) {
         HttpMethodWrap mw = cached.get(method);
         if (mw == null) {
             synchronized (method) {
                 mw = cached.get(method);
                 if (mw == null) {
-                    mw = new HttpMethodWrap(method, path, httpMethod);
+                    mw = new HttpMethodWrap(method, rootPath,subPath, httpMethod);
                     cached.put(method, mw);
                 }
             }
@@ -47,9 +48,13 @@ public class HttpMethodWrap {
      */
     private final Method method;
     /**
-     * 当前http method 的访问路径
+     * 当前http method 的root 访问路径
      */
-    private final String path;
+    private final String rootPath;
+    /**
+     * 子路径
+     */
+    private final String subPath;
     /**
      * http 请求类型
      */
@@ -71,9 +76,11 @@ public class HttpMethodWrap {
         return method.getName();
     }
 
-    public String getPath() {
-        return this.path;
+    public String getRootPath() {
+        return this.rootPath;
     }
+
+    public String getSubPath(){ return this.subPath;}
 
     public HttpMethod getHttpType() {
         return this.httpMethod;

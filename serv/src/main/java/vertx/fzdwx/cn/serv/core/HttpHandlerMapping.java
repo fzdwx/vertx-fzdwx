@@ -14,10 +14,12 @@ public class HttpHandlerMapping {
 
     public final Object source;
     public final HttpMethodWrap methodWrap;
+    public final String rootPath;
 
     private HttpHandlerMapping(final Object source, final HttpMethodWrap methodWrap) {
         this.source = source;
         this.methodWrap = methodWrap;
+        this.rootPath = methodWrap.getRootPath();
     }
 
     /**
@@ -39,15 +41,26 @@ public class HttpHandlerMapping {
      */
     public void attach(final Router router, final Boolean firstFlag) {
         if (firstFlag)
-            log.info("Http Handler Registered: {} {}", methodWrap.getHttpType(), this.methodWrap.getPath());
+            log.info("Http Handler Registered: {} {}", methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath());
 
-        router.route(methodWrap.getHttpType(), this.methodWrap.getPath())
+        router.route(methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath())
                 .handler(rCtx -> {
                     rCtx.json(this.invoke())
                             .subscribe().with(v -> {
                                 rCtx.end().subscribe();
                             });
                 });
+
+        // if (firstFlag)
+        //     log.info("Http Handler Registered: {} {}", methodWrap.getHttpType(), this.methodWrap.getSubPath());
+        //
+        // router.route(methodWrap.getHttpType(), this.methodWrap.getSubPath())
+        //         .handler(rCtx -> {
+        //             rCtx.json(this.invoke())
+        //                     .subscribe().with(v -> {
+        //                         rCtx.end().subscribe();
+        //                     });
+        //         });
     }
 
     @SneakyThrows

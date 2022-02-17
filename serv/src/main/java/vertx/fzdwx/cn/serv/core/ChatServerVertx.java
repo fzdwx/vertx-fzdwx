@@ -4,8 +4,10 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.http.HttpServer;
 import io.vertx.mutiny.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
+import vertx.fzdwx.cn.core.function.lang;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -20,6 +22,7 @@ public class ChatServerVertx extends Verticle {
     private static ChatServerProps chatServerProps;
     private static List<HttpHandlerMapping> httpHandlerMappings;
     private static List<WebSocketListenerMapping> webSocketListenerMappings;
+    private final static Map<String, Router> rootCache = lang.mapOf();
 
     @Override
     protected boolean first() {
@@ -72,10 +75,28 @@ public class ChatServerVertx extends Verticle {
         httpHandlerSup.forEach(w -> {
             w.attach(router, first);
         });
+
+        // httpHandlerSup.stream().collect(Collectors.groupingBy(h -> h.rootPath))
+        //         .forEach((rootPath, mappings) -> {
+        //             final var subRouter = rootCache.getOrDefault(rootPath, ((Supplier<Router>) () -> {
+        //                 final var subRouter0 = Router.router(vertx);
+        //                 router.mountSubRouter(rootPath, subRouter0);
+        //                 rootCache.put(rootPath, subRouter0);
+        //                 return subRouter0;
+        //             }).get());
+        //
+        //             if (first) {
+        //                 log.info("Http Handler Root: {}", rootPath);
+        //             }
+        //             mappings.forEach(m -> {
+        //                 m.attach(subRouter, first);
+        //             });
+        //         });
     }
 
     private static AtomicInteger instanceCount = new AtomicInteger(0);
     private final boolean first;
+
     {
         int number = instanceCount.getAndIncrement();
         first = number == 1;

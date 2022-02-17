@@ -12,23 +12,25 @@ import org.noear.solon.annotation.ServerEndpoint;
 import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.handle.MethodTypeUtil;
+import vertx.fzdwx.cn.core.annotation.Destroy;
 import vertx.fzdwx.cn.core.util.Exc;
 import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
 import vertx.fzdwx.cn.core.wraper.HttpMethodWrap;
-import vertx.fzdwx.cn.serv.core.VerticleBootStrap;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
 import vertx.fzdwx.cn.serv.core.HttpHandlerMapping;
+import vertx.fzdwx.cn.serv.core.VerticleBootStrap;
 import vertx.fzdwx.cn.serv.core.WebSocketListener;
 import vertx.fzdwx.cn.serv.core.WebSocketListenerMapping;
-import vertx.fzdwx.cn.core.annotation.Destroy;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static vertx.fzdwx.cn.core.function.lang.*;
+import static vertx.fzdwx.cn.core.function.lang.contains;
+import static vertx.fzdwx.cn.core.function.lang.defVal;
+import static vertx.fzdwx.cn.core.function.lang.format;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -102,14 +104,18 @@ public class ChatServSolonStarter {
     }
 
     private HttpMethodWrap initMethod(String rootPath, Method method) {
-        if (!rootPath.endsWith("/")) {
-            rootPath = rootPath.concat("/");
+        if (rootPath.endsWith("/")) {
+            rootPath = StrUtil.removeSuffix(rootPath, "/");
         }
+        if (!rootPath.startsWith("/")) {
+            rootPath = "/" + rootPath;
+        }
+
         var subPath = defVal(defVal(method.getAnnotation(Mapping.class).value(), method.getAnnotation(Mapping.class).path()), "");
-        if (subPath.startsWith("/")) {
-            subPath = subPath.substring(1);
+        if (!subPath.startsWith("/")) {
+            subPath = "/" + subPath;
         }
-        return HttpMethodWrap.init(method, rootPath + subPath, initMethodType(method));
+        return HttpMethodWrap.init(method, rootPath, subPath, initMethodType(method));
     }
 
     private HttpMethod initMethodType(Method method) {

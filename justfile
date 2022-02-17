@@ -1,3 +1,3 @@
 # set shell := ["bash.exe","-c"]
 bk:
-    ./gb.exe -c 10 -n 10 -d false -p request.curl.txt
+    ./gb.exe -c 24 -n 100 -d false -p request.curl.txt
