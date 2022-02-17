@@ -25,7 +25,7 @@
         <slf4j.version>2.0.0-alpha4</slf4j.version>
         <lombok.version>1.18.22</lombok.version>
         <solon.version>1.6.22</solon.version>
-        <vertx.mutiny.version>2.6.0</vertx.mutiny.version>
+        <mutiny.version>1.3.1</mutiny.version>
     </properties>
 
     <dependencyManagement>
@@ -65,13 +65,8 @@
             </dependency>
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
-                <artifactId>smallrye-mutiny-vertx-core</artifactId>
-                <version>${vertx.mutiny.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.smallrye.reactive</groupId>
-                <artifactId>smallrye-mutiny-vertx-web</artifactId>
-                <version>${vertx.mutiny.version}</version>
+                <artifactId>mutiny</artifactId>
+                <version>${mutiny.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
