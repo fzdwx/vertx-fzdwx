@@ -17,6 +17,9 @@
         <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+
+        <vertx.verticle>chat.vertx.ChatServ</vertx.verticle>
+        <graal.version>20.3.0</graal.version>
     </properties>
 
     <dependencies>
@@ -46,6 +49,24 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <release>17</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>${graal.version}</version>   <!--(1)-->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <imageName>${project.name}</imageName>    <!--(2)-->
+                    <mainClass>${vertx.verticle}</mainClass>  <!--(3)-->
+                    <buildArgs>-H:+PrintClassInitialization -H:+ReportExceptionStackTraces</buildArgs> <!--(4)-->
                 </configuration>
             </plugin>
         </plugins>
