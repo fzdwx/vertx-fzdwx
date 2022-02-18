@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 @Slf4j
 public class VerticleStarter {
 
-    private ChatServerProps chatServerProps = new ChatServerProps();
+    private ChatServerProps chatServerProps;
     private VerticleBootStrap verticleBootStrap;
     private Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy = new HashMap<>();
 
