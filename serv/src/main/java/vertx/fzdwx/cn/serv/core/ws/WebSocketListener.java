@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn.serv.core;
+package vertx.fzdwx.cn.serv.core.ws;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;

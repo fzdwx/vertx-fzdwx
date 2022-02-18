@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn.serv.core;
+package vertx.fzdwx.cn.serv.core.ws;
 
 import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;

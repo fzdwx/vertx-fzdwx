@@ -2,7 +2,7 @@ package chat.vertx.fzdwx;
 
 import io.vertx.core.http.ServerWebSocket;
 import org.noear.solon.annotation.ServerEndpoint;
-import vertx.fzdwx.cn.serv.core.WebSocketListener;
+import vertx.fzdwx.cn.serv.core.ws.WebSocketListener;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>

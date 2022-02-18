@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn.serv.core;
+package vertx.fzdwx.cn.serv.core.verticle;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
