@@ -2,15 +2,14 @@ package vertx.fzdwx.cn.serv;
 
 import lombok.extern.slf4j.Slf4j;
 import vertx.fzdwx.cn.core.annotation.Destroy;
-import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
-import vertx.fzdwx.cn.serv.core.init.InitVerticle;
-import vertx.fzdwx.cn.serv.core.init.InitVerticleRunnable;
 import vertx.fzdwx.cn.serv.core.verticle.Verticle;
 import vertx.fzdwx.cn.serv.core.verticle.VerticleBootStrap;
+import vertx.fzdwx.cn.serv.core.verticle.init.VerticleDeployLifeCycle;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -21,15 +20,22 @@ public class VerticleStarter {
 
     private ChatServerProps chatServerProps = new ChatServerProps();
     private VerticleBootStrap verticleBootStrap;
-    private Map<String, InitVerticleRunnable<? extends InitVerticle<? extends Verticle>>> deploy = new HashMap<>();
+    private Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy = new HashMap<>();
+
+    public VerticleStarter(final ChatServerProps chatServerProps) {
+        this.chatServerProps = chatServerProps;
+    }
 
     public void start() {
-        StopWatch.start();
         verticleBootStrap = new VerticleBootStrap(chatServerProps, deploy);
         verticleBootStrap.deploy();
     }
 
-    public VerticleStarter addDeploy(String verticleClassName, InitVerticleRunnable<? extends InitVerticle<? extends Verticle>> verticle) {
+    public static VerticleStarter create(ChatServerProps chatServerProps) {
+        return new VerticleStarter(chatServerProps);
+    }
+
+    public VerticleStarter addDeploy(String verticleClassName, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> verticle) {
         deploy.put(verticleClassName, verticle);
         return this;
     }

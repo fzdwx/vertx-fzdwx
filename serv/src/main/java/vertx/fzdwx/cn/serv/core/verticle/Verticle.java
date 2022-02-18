@@ -18,9 +18,6 @@ public abstract class Verticle extends AbstractVerticle {
 
     @Override
     public void start(final Promise<Void> startPromise) throws Exception {
-        if (first()) {
-            log.info("deploy init invoke");
-        }
         start0(startPromise);
     }
 

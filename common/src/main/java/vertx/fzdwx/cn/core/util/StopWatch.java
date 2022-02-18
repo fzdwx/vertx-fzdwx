@@ -8,13 +8,17 @@ package vertx.fzdwx.cn.core.util;
  */
 public class StopWatch {
 
-    public static long time;
+    public long time;
 
-    public static void start() {
-        time = System.currentTimeMillis();
+    private StopWatch() {
+        this.time = System.currentTimeMillis();
     }
 
-    public static long stop() {
+    public static StopWatch start() {
+        return new StopWatch();
+    }
+
+    public long stop() {
         return System.currentTimeMillis() - time;
     }
 }

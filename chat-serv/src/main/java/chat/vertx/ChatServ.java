@@ -33,14 +33,15 @@ public class ChatServ {
                         stream().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
 
         final var chatServerProps = new ChatServerProps();
-        final var verticleSolonStarter = new VerticleStarter()
-                .addDeploy("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx", () -> new ChatServerVertx.ChatInit().init().accept(listOf(
-                        chatServerProps,
-                        controllers,
-                        listOf(),
-                        parsers
-                )));
 
-        verticleSolonStarter.start();
+        VerticleStarter.create(chatServerProps)
+                .addDeploy("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx",
+                        new ChatServerVertx.ChatInit().preDeploy(() -> listOf(chatServerProps,
+                                        controllers,
+                                        listOf(),
+                                        parsers)
+                        ))
+                .start();
+
     }
 }

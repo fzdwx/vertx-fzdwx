@@ -2,6 +2,7 @@ package vertx.fzdwx.cn.serv.core.verticle;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -12,12 +13,13 @@ import vertx.fzdwx.cn.core.annotation.Mapping;
 import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
 import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.util.Exc;
+import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
 import vertx.fzdwx.cn.core.wraper.HttpMethodWrap;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
 import vertx.fzdwx.cn.serv.core.http.HttpHandlerMapping;
-import vertx.fzdwx.cn.serv.core.init.InitVerticle;
-import vertx.fzdwx.cn.serv.core.init.InitVerticleConsumer;
+import vertx.fzdwx.cn.serv.core.verticle.init.InitCallable;
+import vertx.fzdwx.cn.serv.core.verticle.init.VerticleDeployLifeCycle;
 import vertx.fzdwx.cn.serv.core.parser.HttpArgumentParser;
 import vertx.fzdwx.cn.serv.core.ws.WebSocketListener;
 import vertx.fzdwx.cn.serv.core.ws.WebSocketListenerMapping;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import static vertx.fzdwx.cn.core.function.lang.defVal;
 import static vertx.fzdwx.cn.core.function.lang.format;
@@ -41,25 +44,38 @@ public class ChatServerVertx extends Verticle {
 
     public HttpServer chatServer;
     private Router router;
-    private static ChatServerProps serverProps;
+    private static ChatServerProps chatServerProps;
     private static Map<String, HttpArgumentParser> parsers;
     private static List<HttpHandlerMapping> httpHandlerMappings;
     private static List<WebSocketListenerMapping> webSocketListenerMappings;
 
-    public static class ChatInit implements InitVerticle<Verticle> {
+    @Slf4j
+    public static class ChatInit implements VerticleDeployLifeCycle<Verticle> {
+
+        static StopWatch t;
 
         @Override
-        public InitVerticleConsumer<List<Object>, ChatInit> init() {
-            return objects -> {
+        public Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> preDeploy(InitCallable<List<Object>> action) {
+            return () -> {
+                final var objects = action.call();
+                chatServerProps = (ChatServerProps) objects.get(0);
+
+                log.info(chatServerProps.getAppName() + " start up");
+
+                t = StopWatch.start();
                 List<Object> controllers = (List<Object>) objects.get(1);
                 List<WebSocketListener> webSocketListeners = (List<WebSocketListener>) objects.get(2);
 
-                serverProps = (ChatServerProps) objects.get(0);
                 parsers = (Map<String, HttpArgumentParser>) objects.get(3);
                 httpHandlerMappings = collectHttp(controllers);
                 webSocketListenerMappings = collectWs(webSocketListeners);
                 return this;
             };
+        }
+
+        @Override
+        public void deployComplete(final AsyncResult<String> completion) {
+            log.info(chatServerProps.getAppName() + " started in " + t.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
         }
     }
 
@@ -80,7 +96,7 @@ public class ChatServerVertx extends Verticle {
                     log.error("", ex.getCause());
                 })
                 .requestHandler(router)
-                .listen(serverProps.getPort(), res -> {
+                .listen(chatServerProps.getPort(), res -> {
                     if (res.succeeded()) {
                         chatServer = res.result();
                         startPromise.complete();

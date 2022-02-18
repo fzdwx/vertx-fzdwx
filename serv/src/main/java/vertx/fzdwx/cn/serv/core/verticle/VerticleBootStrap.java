@@ -3,10 +3,10 @@ package vertx.fzdwx.cn.serv.core.verticle;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
-import vertx.fzdwx.cn.serv.core.init.InitVerticle;
-import vertx.fzdwx.cn.serv.core.init.InitVerticleRunnable;
+import vertx.fzdwx.cn.serv.core.verticle.init.VerticleDeployLifeCycle;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -16,11 +16,11 @@ import java.util.Map;
 public class VerticleBootStrap {
 
     private final ChatServerProps chatServerProps = new ChatServerProps();
-    private final Map<String, InitVerticleRunnable<? extends InitVerticle<? extends Verticle>>> deploy;
+    private final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy;
     static Vertx vertx;
 
     public VerticleBootStrap(final ChatServerProps chatServerProps,
-                             final Map<String, InitVerticleRunnable<? extends InitVerticle<? extends Verticle>>> deploy) {
+                             final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy) {
         vertx = Vertx.vertx(chatServerProps.getVertxOps());
         this.deploy = deploy;
     }
@@ -30,8 +30,9 @@ public class VerticleBootStrap {
      */
     public void deploy() {
         deploy.forEach((s, init) -> {
-            init.run();
-            vertx.deployVerticle(s, chatServerProps.getDeployOps(), f -> {
+            final VerticleDeployLifeCycle<? extends Verticle> verticleDeployLifeCycle = init.get();
+            vertx.deployVerticle(s, chatServerProps.getDeployOps(), completion -> {
+                verticleDeployLifeCycle.deployComplete(completion);
             });
         });
     }
