@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn.serv;
+package chat.vertx.fzdwx;
 
 import io.vertx.ext.web.RoutingContext;
 import lombok.SneakyThrows;

@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn;
+package chat.vertx;
 
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Import;

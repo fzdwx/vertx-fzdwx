@@ -1,4 +1,4 @@
-package vertx.fzdwx.cn.serv;
+package chat.vertx.fzdwx;
 
 import io.vertx.core.http.ServerWebSocket;
 import org.noear.solon.annotation.ServerEndpoint;
