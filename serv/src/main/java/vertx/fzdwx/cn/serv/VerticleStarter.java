@@ -34,7 +34,7 @@ import static vertx.fzdwx.cn.core.function.lang.format;
  * @date 2022/2/13 15:20
  */
 @Slf4j
-public class VerticleSolonStarter {
+public class VerticleStarter {
 
     private ChatServerProps chatServerProps = new ChatServerProps();
     private Map<String, HttpArgumentParser> parsers;
@@ -46,7 +46,9 @@ public class VerticleSolonStarter {
         verticleBootStrap = new VerticleBootStrap(chatServerProps, collectHttp(controllers), collectWs(webSocketListeners));
         verticleBootStrap.deploy()
                 .onComplete(res -> {
+                    // TODO: 2022/2/18 暂时放这里，后面要改
                     log.info(chatServerProps.getAppName() + " started in " + StopWatch.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
+                    // log.info("deploy finish");
                 });
     }
 
