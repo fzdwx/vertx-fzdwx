@@ -1,14 +1,12 @@
 package vertx.fzdwx.cn.serv.core.verticle;
 
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
-import vertx.fzdwx.cn.serv.core.http.HttpHandlerMapping;
-import vertx.fzdwx.cn.serv.core.ws.WebSocketListenerMapping;
+import vertx.fzdwx.cn.serv.core.init.InitVerticle;
+import vertx.fzdwx.cn.serv.core.init.InitVerticleRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -17,28 +15,25 @@ import java.util.List;
 @Slf4j
 public class VerticleBootStrap {
 
-    static ChatServerProps chatServerProps = new ChatServerProps();
-    static List<HttpHandlerMapping> httpHandlerMappings = new ArrayList<>();
-    static List<WebSocketListenerMapping> webSocketListenerMappings = new ArrayList<>();
+    private final ChatServerProps chatServerProps = new ChatServerProps();
+    private final Map<String, InitVerticleRunnable<? extends InitVerticle<? extends Verticle>>> deploy;
     static Vertx vertx;
 
-    public VerticleBootStrap(
-            final ChatServerProps chatServerProps,
-            final List<HttpHandlerMapping> httpHandlerMappings,
-            final List<WebSocketListenerMapping> webSocketListenerMappings) {
+    public VerticleBootStrap(final ChatServerProps chatServerProps,
+                             final Map<String, InitVerticleRunnable<? extends InitVerticle<? extends Verticle>>> deploy) {
         vertx = Vertx.vertx(chatServerProps.getVertxOps());
-        VerticleBootStrap.chatServerProps.other(chatServerProps);
-        VerticleBootStrap.httpHandlerMappings.addAll(httpHandlerMappings);
-        VerticleBootStrap.webSocketListenerMappings.addAll(webSocketListenerMappings);
+        this.deploy = deploy;
     }
 
     /**
      * 部署
-     *
-     * @return {@link String }
      */
-    public Future<String> deploy() {
-        return vertx.deployVerticle("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx", chatServerProps.getDeployOps());
+    public void deploy() {
+        deploy.forEach((s, init) -> {
+            init.run();
+            vertx.deployVerticle(s, chatServerProps.getDeployOps(), f -> {
+            });
+        });
     }
 
     public void stop() {

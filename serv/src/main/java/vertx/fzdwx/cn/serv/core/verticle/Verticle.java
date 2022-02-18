@@ -20,7 +20,6 @@ public abstract class Verticle extends AbstractVerticle {
     public void start(final Promise<Void> startPromise) throws Exception {
         if (first()) {
             log.info("deploy init invoke");
-            init();
         }
         start0(startPromise);
     }
@@ -39,11 +38,6 @@ public abstract class Verticle extends AbstractVerticle {
      * </pre>
      */
     protected abstract boolean first();
-
-    /**
-     * 初始化,只会执行一次
-     */
-    protected abstract void init();
 
     public abstract void start0(final Promise<Void> startPromise);
 }
