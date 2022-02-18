@@ -40,19 +40,19 @@
                 <artifactId>common</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
-
-            <!-- 用于ioc 与 aop -->
+<!--
+            &lt;!&ndash; 用于ioc 与 aop &ndash;&gt;
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>solon</artifactId>
                 <version>${solon.version}</version>
             </dependency>
-            <!-- yml配置支持组件 -->
+            &lt;!&ndash; yml配置支持组件 &ndash;&gt;
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>solon.extend.properties.yaml</artifactId>
                 <version>${solon.version}</version>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>logback-solon-plugin</artifactId>
@@ -61,6 +61,11 @@
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-web</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-service-proxy</artifactId>
                 <version>${vertx.version}</version>
             </dependency>
             <dependency>

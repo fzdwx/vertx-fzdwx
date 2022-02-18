@@ -1,7 +1,7 @@
 package chat.vertx.fzdwx;
 
 import io.vertx.core.http.ServerWebSocket;
-import org.noear.solon.annotation.ServerEndpoint;
+import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
 import vertx.fzdwx.cn.serv.core.ws.WebSocketListener;
 
 /**
@@ -19,5 +19,10 @@ public class TestServerEndpoint implements WebSocketListener {
     @Override
     public void onclose(final ServerWebSocket ws) {
         System.out.println("web socket 关闭");
+    }
+
+    @Override
+    public void onError(final ServerWebSocket ws, final Throwable thr) {
+
     }
 }

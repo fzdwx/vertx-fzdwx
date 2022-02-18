@@ -32,6 +32,7 @@ public class ChatServerVertx extends Verticle {
     @Override
     public void start0(final Promise<Void> startPromise) {
         this.router = Router.router(vertx);
+        // TODO: 2022/2/18 换种方式
         initWsHandler(VerticleBootStrap.webSocketListenerMappings);
         initHttpHandler(VerticleBootStrap.httpHandlerMappings);
 

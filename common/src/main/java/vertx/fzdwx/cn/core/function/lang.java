@@ -726,4 +726,12 @@ public interface lang {
     static <T> List<T> disjunction(final List<T> l1, final List<T> l2) {
         return (List<T>) CollUtil.disjunction(l1, l2);
     }
+
+    static List<String> split(String text) {
+        return StrUtil.split(text,".");
+    }
+
+    static List<String> split(String text,String pattern) {
+        return StrUtil.split(text,pattern);
+    }
 }

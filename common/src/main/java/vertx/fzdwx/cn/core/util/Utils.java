@@ -1,11 +1,8 @@
 package vertx.fzdwx.cn.core.util;
 
-import org.noear.solon.annotation.Delete;
-import org.noear.solon.annotation.Get;
-import org.noear.solon.annotation.Head;
-import org.noear.solon.annotation.Patch;
-import org.noear.solon.annotation.Post;
-import org.noear.solon.annotation.Put;
+
+import vertx.fzdwx.cn.core.annotation.Get;
+import vertx.fzdwx.cn.core.annotation.Post;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -57,11 +54,7 @@ public interface Utils {
     static List<Class<? extends Annotation>> allHttpType() {
         return List.of(
                 Get.class,
-                Post.class,
-                Put.class,
-                Delete.class,
-                Patch.class,
-                Head.class
+                Post.class
         );
     }
 }

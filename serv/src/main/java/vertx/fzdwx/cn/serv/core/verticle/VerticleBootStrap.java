@@ -38,7 +38,7 @@ public class VerticleBootStrap {
      * @return {@link String }
      */
     public Future<String> deploy() {
-        return vertx.deployVerticle("vertx.fzdwx.cn.serv.core.ChatServerVertx", chatServerProps.getDeployOps());
+        return vertx.deployVerticle("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx", chatServerProps.getDeployOps());
     }
 
     public void stop() {

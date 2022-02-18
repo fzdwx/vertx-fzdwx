@@ -3,9 +3,9 @@ package chat.vertx.fzdwx;
 import io.vertx.ext.web.RoutingContext;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.noear.solon.annotation.Controller;
-import org.noear.solon.annotation.Get;
-import org.noear.solon.annotation.Mapping;
+import vertx.fzdwx.cn.core.annotation.Controller;
+import vertx.fzdwx.cn.core.annotation.Get;
+import vertx.fzdwx.cn.core.annotation.Mapping;
 import vertx.fzdwx.cn.core.annotation.Param;
 
 /**

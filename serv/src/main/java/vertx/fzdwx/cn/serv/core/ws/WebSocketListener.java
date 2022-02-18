@@ -11,7 +11,6 @@ import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.function.tuple.Tuple;
 import vertx.fzdwx.cn.core.function.tuple.Tuple2;
 import vertx.fzdwx.cn.core.util.Exc;
-import vertx.fzdwx.cn.core.util.Print;
 
 /**
  * websocket endpoint 必须实现该类
@@ -59,9 +58,7 @@ public interface WebSocketListener {
      * @param ws  websocket
      * @param thr thr
      */
-    default void onError(ServerWebSocket ws, Throwable thr) {
-        Print.print("websocket has error", thr);
-    }
+     void onError(ServerWebSocket ws, Throwable thr);
 
     /**
      * 处理二进制数据
@@ -70,7 +67,7 @@ public interface WebSocketListener {
      * @param buf 二进制数据Buf
      */
     default void handleBinary(final ServerWebSocket ws, Buffer buf) {
-        Print.print("websocket receive binary data", buf);
+        //
     }
 
     /**
@@ -80,7 +77,7 @@ public interface WebSocketListener {
      * @param message message
      */
     default void handleText(final ServerWebSocket ws, String message) {
-        Print.print("websocket receive message data", message);
+        //
     }
 
     /**
