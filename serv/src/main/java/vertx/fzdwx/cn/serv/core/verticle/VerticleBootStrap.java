@@ -17,7 +17,7 @@ public class VerticleBootStrap {
 
     private final ChatServerProps chatServerProps = new ChatServerProps();
     private final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy;
-    static Vertx vertx;
+    public final Vertx vertx;
 
     public VerticleBootStrap(final ChatServerProps chatServerProps,
                              final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy) {

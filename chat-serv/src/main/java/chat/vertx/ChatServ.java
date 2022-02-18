@@ -38,7 +38,6 @@ public class ChatServ {
                 .stream().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
         // 加载配置
         final var chatServerProps = new ChatServerProps();
-
         // 部署
         VerticleStarter.create(chatServerProps)
                 .addDeploy("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx",
