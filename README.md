@@ -6,9 +6,11 @@
 
 websocket测试网站：http://www.easyswoole.com/wstool.html
 
-# http handler 与 websocket endpoint 挂载原理
-
+**http handler 与 websocket endpoint 挂载原理**
 具体实现可以看=>[ChatServerVertx](https://github.com/fzdwx/chat/blob/3c3ed609b330bee8e818bb4808eb1c9017ac0602/serv/src/main/java/vertx/fzdwx/cn/serv/core/verticle/ChatServerVertx.java)
+<br>
+
+<br>
 
 **http handler demo**
 
@@ -29,6 +31,7 @@ public class TestController {
     }
 }
 ```
+<br>
 
 **websocket end point demo**
 
@@ -53,6 +56,7 @@ public class TestServerEndpoint implements WebSocketListener {
     }
 }
 ```
+<br>
 
 ### 启动
 
