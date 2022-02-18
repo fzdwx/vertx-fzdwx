@@ -4,10 +4,8 @@ import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
-import vertx.fzdwx.cn.core.function.lang;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -19,10 +17,6 @@ public class ChatServerVertx extends Verticle {
 
     public HttpServer chatServer;
     private Router router;
-    private static ChatServerProps chatServerProps;
-    private static List<HttpHandlerMapping> httpHandlerMappings;
-    private static List<WebSocketListenerMapping> webSocketListenerMappings;
-    private final static Map<String, Router> rootCache = lang.mapOf();
 
     @Override
     protected boolean first() {
@@ -31,23 +25,20 @@ public class ChatServerVertx extends Verticle {
 
     @Override
     protected void init() {
-        chatServerProps = (ChatServerProps) VerticleBootStrap.map.get("chatServerProps");
-        httpHandlerMappings = (List<HttpHandlerMapping>) VerticleBootStrap.map.get("httpHandlerMappings");
-        webSocketListenerMappings = (List<WebSocketListenerMapping>) VerticleBootStrap.map.get("webSocketListenerMappings");
     }
 
     @Override
     public void start0(final Promise<Void> startPromise) {
         this.router = Router.router(vertx);
-        initWsHandler(webSocketListenerMappings);
-        initHttpHandler(httpHandlerMappings);
+        initWsHandler(VerticleBootStrap.webSocketListenerMappings);
+        initHttpHandler(VerticleBootStrap.httpHandlerMappings);
 
         vertx.createHttpServer()
-                // .exceptionHandler(ex -> {
-                //     log.error("", ex.getCause());
-                // })
+                .exceptionHandler(ex -> {
+                    log.error("", ex.getCause());
+                })
                 .requestHandler(router)
-                .listen(chatServerProps.getPort(), res -> {
+                .listen(VerticleBootStrap.chatServerProps.getPort(), res -> {
                     if (res.succeeded()) {
                         chatServer = res.result();
                         startPromise.complete();

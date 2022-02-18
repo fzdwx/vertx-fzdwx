@@ -9,7 +9,7 @@ import org.noear.solon.annotation.Import;
  * @author <a href="mailto:likelovec@gmail.com">like</a>
  * @date 2022-02-13 14:06:09
  */
-@Import(scanPackages = {"vertx.fzdwx"})
+@Import(scanPackages = {"vertx.fzdwx","chat.vertx.fzdwx"})
 public class ChatServ {
 
     public static void main(String[] args) {

@@ -42,4 +42,11 @@ public class ChatServerProps {
         return new DeploymentOptions().setInstances(deployInstances);
     }
 
+    public ChatServerProps other(final ChatServerProps other) {
+        this.appName = other.getAppName();
+        this.port = other.getPort();
+        this.eventLoopPoolSize = other.eventLoopPoolSize;
+        this.deployInstances = other.deployInstances;
+        return this;
+    }
 }

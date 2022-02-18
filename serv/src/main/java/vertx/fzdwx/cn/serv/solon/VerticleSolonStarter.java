@@ -13,7 +13,6 @@ import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.handle.MethodTypeUtil;
 import vertx.fzdwx.cn.core.annotation.Destroy;
-import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.util.Exc;
 import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
@@ -24,15 +23,11 @@ import vertx.fzdwx.cn.serv.core.VerticleBootStrap;
 import vertx.fzdwx.cn.serv.core.WebSocketListener;
 import vertx.fzdwx.cn.serv.core.WebSocketListenerMapping;
 import vertx.fzdwx.cn.serv.core.parser.HttpArgumentParser;
-import vertx.fzdwx.cn.serv.solon.parser.ParamParser;
-import vertx.fzdwx.cn.serv.solon.parser.RoutingContextParser;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static vertx.fzdwx.cn.core.function.lang.contains;
 import static vertx.fzdwx.cn.core.function.lang.defVal;
@@ -44,15 +39,14 @@ import static vertx.fzdwx.cn.core.function.lang.format;
  */
 @Slf4j
 @Component
-public class ChatServSolonStarter {
+public class VerticleSolonStarter {
 
     @Inject("${chat.serv}")
     private ChatServerProps chatServerProps;
+    @Inject
+    private Map<String, HttpArgumentParser> parsers;
     private VerticleBootStrap verticleBootStrap;
-    final Map<String, HttpArgumentParser> parsers = lang.<HttpArgumentParser>listOf(new ParamParser(), new RoutingContextParser()).
-            stream().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
 
-    // vertx.deployVerticle(chatServerProps.getAppName() + "-vert.x", chatServerProps.getDeployOps()).await().indefinitely();
     @Init
     public void init() {
         StopWatch.start();
@@ -70,7 +64,7 @@ public class ChatServSolonStarter {
     }
 
     public List<WebSocketListenerMapping> collectWs() {
-        return Aop.beanFind((ChatServSolonStarter::wxCondition))
+        return Aop.beanFind((VerticleSolonStarter::wxCondition))
                 .stream()
                 .map(beanWrap -> {
                     final var serverEndpoint = beanWrap.annotationGet(ServerEndpoint.class);
@@ -81,7 +75,7 @@ public class ChatServSolonStarter {
     }
 
     public List<HttpHandlerMapping> collectHttp() {
-        return Aop.beanFind((ChatServSolonStarter::httpCondition))
+        return Aop.beanFind((VerticleSolonStarter::httpCondition))
                 .stream()
                 .flatMap(beanWrap -> {
                     final var parentMapping = beanWrap.annotationGet(Mapping.class);

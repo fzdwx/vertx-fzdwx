@@ -4,9 +4,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -15,28 +14,19 @@ import java.util.Map;
 @Slf4j
 public class VerticleBootStrap {
 
-    public static Map<Object, Object> map = new HashMap<>();
-    private static ChatServerProps chatServerProps;
-    private static List<HttpHandlerMapping> httpHandlerMappings;
-    private static List<WebSocketListenerMapping> webSocketListenerMappings;
-    private static Vertx vertx;
+    static ChatServerProps chatServerProps = new ChatServerProps();
+    static List<HttpHandlerMapping> httpHandlerMappings = new ArrayList<>();
+    static List<WebSocketListenerMapping> webSocketListenerMappings = new ArrayList<>();
+    static Vertx vertx;
 
     public VerticleBootStrap(
             final ChatServerProps chatServerProps,
             final List<HttpHandlerMapping> httpHandlerMappings,
             final List<WebSocketListenerMapping> webSocketListenerMappings) {
         vertx = Vertx.vertx(chatServerProps.getVertxOps());
-        VerticleBootStrap.chatServerProps = chatServerProps;
-        VerticleBootStrap.httpHandlerMappings = httpHandlerMappings;
-        VerticleBootStrap.webSocketListenerMappings = webSocketListenerMappings;
-        init();
-    }
-
-    // TODO: 2022/2/17 优化
-    public void init() {
-        map.put("chatServerProps", chatServerProps);
-        map.put("httpHandlerMappings", httpHandlerMappings);
-        map.put("webSocketListenerMappings", webSocketListenerMappings);
+        VerticleBootStrap.chatServerProps.other(chatServerProps);
+        VerticleBootStrap.httpHandlerMappings.addAll(httpHandlerMappings);
+        VerticleBootStrap.webSocketListenerMappings.addAll(webSocketListenerMappings);
     }
 
     /**
