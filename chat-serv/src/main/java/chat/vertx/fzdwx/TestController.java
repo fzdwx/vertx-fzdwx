@@ -8,6 +8,8 @@ import vertx.fzdwx.cn.core.annotation.Get;
 import vertx.fzdwx.cn.core.annotation.Mapping;
 import vertx.fzdwx.cn.core.annotation.Param;
 
+import java.util.Map;
+
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
  * @date 2022/2/13 16:10
@@ -20,9 +22,9 @@ public class TestController {
     @SneakyThrows
     @Get
     @Mapping("/hello/:id/:name")
-    public void hello(RoutingContext context, @Param("id") int id, @Param("name") String name) {
+    public Map<String, String> hello(RoutingContext context, @Param("id") int id, @Param("name") String name) {
         log.info("invoke");
-        context.redirect("http://localhost:8080/#/homePage");
-        // return Map.of("hello", "world");
+        // context.redirect("http://localhost:8080/#/homePage");
+        return Map.of("hello", "world");
     }
 }
