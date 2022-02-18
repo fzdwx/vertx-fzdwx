@@ -57,7 +57,9 @@ public class HttpHandlerMapping {
 
         router.route(methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath())
                 .handler(rtx -> {
-                    final var result = this.invoke(rtx);
+                    final var result = this.invokeAndParseArguments(rtx);
+
+                    // handler http request result
                     if (!methodWrap.getReturnType().getName().equals("void")) {
                         rtx.json(result);
                     }
@@ -65,13 +67,16 @@ public class HttpHandlerMapping {
     }
 
     @SneakyThrows
-    public Object invoke(final RoutingContext context) {
+    public Object invokeAndParseArguments(final RoutingContext context) {
         final var paramWraps = methodWrap.getParamWraps();
         final var length = paramWraps.length;
+
         Object[] objects = new Object[length];
+
         for (int i = 0; i < length; i++) {
             objects[i] = parsers.get(i).parser(context, paramWraps[i]);
         }
+
         return this.methodWrap.invoke(source, objects);
     }
 
