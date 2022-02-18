@@ -29,15 +29,20 @@ import static vertx.fzdwx.cn.core.function.lang.listOf;
 public class ChatServ {
 
     public static void main(String[] args) {
+        // 加载controller
         final List<Object> controllers = List.of(new TestController());
+        // 加载ws
         final List<WebSocketListener> webSocketListeners = List.of(new TestServerEndpoint());
+        // 加载http注解参数解析器
         Map<String, HttpArgumentParser> parsers = lang.listOf(new ParamParser(), new RoutingContextParser())
                 .stream().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
-
+        // 加载配置
         final var chatServerProps = new ChatServerProps();
 
+        // 部署
         VerticleStarter.create(chatServerProps)
                 .addDeploy("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx",
+                        // ChatServerVertx 生命周期实现类，用于初始化数据
                         new ChatServerVertx.ChatInit().preDeploy(() -> listOf(chatServerProps,
                                 controllers,
                                 webSocketListeners,
