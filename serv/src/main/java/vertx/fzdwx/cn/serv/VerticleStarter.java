@@ -2,6 +2,7 @@ package vertx.fzdwx.cn.serv;
 
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+import vertx.fzdwx.cn.core.util.PrintUtil;
 import vertx.fzdwx.cn.serv.core.ChatServerProps;
 import vertx.fzdwx.cn.serv.core.verticle.Verticle;
 import vertx.fzdwx.cn.serv.core.verticle.VerticleBootStrap;
@@ -18,9 +19,14 @@ import java.util.function.Supplier;
 @Slf4j
 public class VerticleStarter {
 
-    private ChatServerProps chatServerProps;
+    private final String version = "0.01";
+    private final ChatServerProps chatServerProps;
+    private final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy = new HashMap<>();
     private VerticleBootStrap verticleBootStrap;
-    private Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy = new HashMap<>();
+
+    private VerticleStarter(final ChatServerProps chatServerProps) {
+        this.chatServerProps = chatServerProps;
+    }
 
     public static VerticleStarter create(ChatServerProps chatServerProps) {
         return new VerticleStarter(chatServerProps);
@@ -42,8 +48,17 @@ public class VerticleStarter {
      * 启动
      */
     public void start() {
+        printBanner();
         verticleBootStrap = new VerticleBootStrap(chatServerProps, deploy);
         verticleBootStrap.deploy();
+    }
+
+    private void printBanner() {
+        System.out.println("    ____          __             ");
+        System.out.println("   / __/___  ____/ /      __" + PrintUtil.ANSI_CYAN + "_  __" + PrintUtil.ANSI_RESET);
+        System.out.println("  / /_/_  / /" + PrintUtil.ANSI_RED + " __" + PrintUtil.ANSI_RESET + "  / | /| / " + PrintUtil.ANSI_CYAN + "/ |/_/" + PrintUtil.ANSI_RESET);
+        System.out.println(" / __/ / /_/ " + PrintUtil.ANSI_RED + "/_/" + PrintUtil.ANSI_RESET + " /| |/ |/ /" + PrintUtil.ANSI_CYAN + ">  <  " + PrintUtil.ANSI_RESET);
+        System.out.println("/_/   /___/\\__,_/ |__/|__" + PrintUtil.ANSI_CYAN + "/_/|_|  " + PrintUtil.ANSI_RESET + "version - " + version + " ::https://github.com/fzdwx:: ");
     }
 
     /**
@@ -58,9 +73,5 @@ public class VerticleStarter {
      */
     public Vertx vertx() {
         return verticleBootStrap.vertx;
-    }
-
-    private VerticleStarter(final ChatServerProps chatServerProps) {
-        this.chatServerProps = chatServerProps;
     }
 }
