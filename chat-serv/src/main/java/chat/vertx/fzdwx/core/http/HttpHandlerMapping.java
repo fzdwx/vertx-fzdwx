@@ -47,13 +47,10 @@ public class HttpHandlerMapping {
     /**
      * 将当前http method handler挂载到router上去
      *
-     * @param router    路由器
-     * @param firstFlag firstFlag
+     * @param router 路由器
      */
-    public void attach(final Router router, final Boolean firstFlag) {
-        if (firstFlag) {
-            log.info("Http Handler Registered: {} {}", methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath());
-        }
+    public void attach(final Router router) {
+        log.info("Http Handler Registered: {} {}", methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath());
 
         router.route(methodWrap.getHttpType(), this.methodWrap.getRootPath() + this.methodWrap.getSubPath())
                 .handler(rtx -> {

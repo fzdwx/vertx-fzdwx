@@ -31,11 +31,10 @@ public class WebSocketListenerMapping {
     /**
      * 将当前websocket请求处理器挂载到router上
      *
-     * @param router    router
-     * @param firstFlag 是否为第一次启动
+     * @param router router
      */
-    public void attach(final Router router, final Boolean firstFlag) {
-        if (firstFlag) log.info("WebSocket Endpoint Registered: " + path);
+    public void attach(final Router router) {
+        log.info("WebSocket Endpoint Registered: " + path);
 
         router.get(path)
                 .handler(ctx -> {

@@ -1,10 +1,12 @@
 package chat.vertx.fzdwx.config;
 
+import chat.vertx.fzdwx.core.ChatServerProps;
 import chat.vertx.fzdwx.core.ChatServerVertx;
 import chat.vertx.fzdwx.core.parser.BodyParser;
 import chat.vertx.fzdwx.core.parser.HttpArgumentParser;
 import chat.vertx.fzdwx.core.parser.ParamParser;
 import chat.vertx.fzdwx.core.parser.RoutingContextParser;
+import chat.vertx.fzdwx.core.ws.WebSocketListener;
 import cn.hutool.json.JSONUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -19,15 +21,11 @@ import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
 import vertx.fzdwx.cn.core.annotation.Controller;
 import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
-import vertx.fzdwx.cn.core.verticle.VerticleStarter;
 import vertx.fzdwx.cn.redis.Redis;
 import vertx.fzdwx.cn.redis.RedisApi;
 
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.stream.Stream;
-
-import static vertx.fzdwx.cn.core.function.lang.listOf;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">fzdwx</a>
@@ -44,13 +42,11 @@ public class ChatServConfiguration {
             return p.annotationGet(Controller.class) != null;
         }).stream().map(BeanWrap::get).toList();
 
-        final var ws = Aop.context().beanFind(p -> {
-            return p.annotationGet(ServerEndpoint.class) != null;
-        }).stream().map(BeanWrap::get).toList();
+        final List<WebSocketListener> ws = Aop.context().beanFind(p -> p.annotationGet(ServerEndpoint.class) != null)
+                .stream().map(b -> ((WebSocketListener) b.get()))
+                .toList();
 
-        // 优化
-        final var chatInit = new ChatServerVertx.ChatInit(() -> listOf(config, controller, ws, parsers().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()))));
-        VerticleStarter.create(config, vertx).addDeploy("chat.vertx.fzdwx.core.ChatServerVertx", chatInit).start();
+        new ChatServerVertx(new ChatServerProps(), controller, ws, parsers()).start();
     }
 
     @Bean

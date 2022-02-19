@@ -1,6 +1,7 @@
 package chat.vertx.fzdwx.api;
 
 import io.vertx.ext.web.RoutingContext;
+import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import vertx.fzdwx.cn.core.annotation.Controller;
@@ -19,6 +20,7 @@ import java.util.Map;
 @Component
 @Controller
 @Mapping("/auth")
+@Slf4j
 public class AuthApi {
 
     @Inject
@@ -30,6 +32,7 @@ public class AuthApi {
     @Get
     @Mapping("/signIn")
     public Map<Integer, Integer> signIn(RoutingContext context) {
+        log.info("test");
         System.out.println(redis);
         return Map.of(1, 2);
     }
