@@ -8,7 +8,6 @@ import vertx.fzdwx.cn.core.util.JsonObjectUtil;
 import vertx.fzdwx.cn.core.verticle.init.VerticleDeployLifeCycle;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -19,9 +18,9 @@ public class VerticleBootStrap {
 
     private final Vertx vertx;
     private final JsonObject config;
-    private final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy;
+    private final Map<String, VerticleDeployLifeCycle<? extends Verticle>> deploy;
 
-    public VerticleBootStrap(Vertx vertx, final JsonObject config, final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy) {
+    public VerticleBootStrap(Vertx vertx, final JsonObject config, final Map<String, VerticleDeployLifeCycle<? extends Verticle>> deploy) {
         this.vertx = vertx;
         this.config = config;
         this.deploy = deploy;
@@ -31,8 +30,8 @@ public class VerticleBootStrap {
      * 部署
      */
     public void deploy() {
-        deploy.forEach((s, init) -> {
-            final VerticleDeployLifeCycle<? extends Verticle> lifeCycle = init.get();
+        deploy.forEach((className, lifeCycle) -> {
+            lifeCycle.preDeploy();
             JsonObject deployConfig = config.getJsonObject(lifeCycle.deployPropsPrefix());
             if (deployConfig == null) {
                 deployConfig = JsonObjectUtil.collect(lifeCycle.deployPropsPrefix(), config);
@@ -41,7 +40,7 @@ public class VerticleBootStrap {
                 }
             }
 
-            vertx.deployVerticle(s, new DeploymentOptions(deployConfig), completion -> {
+            vertx.deployVerticle(className, new DeploymentOptions(deployConfig), completion -> {
                 lifeCycle.deployComplete(completion);
             });
         });

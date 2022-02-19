@@ -3,9 +3,6 @@ package vertx.fzdwx.cn.core.verticle.init;
 import io.vertx.core.AsyncResult;
 import vertx.fzdwx.cn.core.verticle.Verticle;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 /**
  * verticle deploy 生命周期类
  *
@@ -23,13 +20,9 @@ public interface VerticleDeployLifeCycle<V extends Verticle> {
     String deployPropsPrefix();
 
     /**
-     * 部署之前
-     *
-     * @param action 行动
-     * @return 强制返回this
-     * @apiNote 只执行一次，用来做一些初始化的操作
+     * 部署之前的操作
      */
-    Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> preDeploy(InitCallable<List<Object>> action);
+    void preDeploy();
 
     /**
      * 部署完成

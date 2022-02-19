@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import static vertx.fzdwx.cn.core.function.lang.defVal;
 import static vertx.fzdwx.cn.core.function.lang.format;
@@ -165,37 +164,40 @@ public class ChatServerVertx extends Verticle {
 
         static StopWatch t;
 
+        private final InitCallable<List<Object>> action;
+
+        public ChatInit(final InitCallable<List<Object>> action) {
+            this.action = action;
+        }
+
         @Override
         public String deployPropsPrefix() {
             return "chatServ";
         }
 
         @Override
-        public Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> preDeploy(InitCallable<List<Object>> action) {
-            return () -> {
-                final var objects = action.call();
-                final JsonObject config = ((JsonObject) objects.get(0));
-                var deployConfig = config.getJsonObject(deployPropsPrefix());
-                if (deployConfig == null) {
-                    deployConfig = JsonObjectUtil.collect(deployPropsPrefix(), config);
-                    if (deployConfig.size() == 0) {
-                        throw new IllegalArgumentException(deployPropsPrefix() + " 未找到对应的部署配置");
-                    }
+        public void preDeploy() {
+            final var objects = action.call();
+            final JsonObject config = ((JsonObject) objects.get(0));
+            var deployConfig = config.getJsonObject(deployPropsPrefix());
+            if (deployConfig == null) {
+                deployConfig = JsonObjectUtil.collect(deployPropsPrefix(), config);
+                if (deployConfig.size() == 0) {
+                    throw new IllegalArgumentException(deployPropsPrefix() + " 未找到对应的部署配置");
                 }
+            }
 
-                ChatServerPropsConverter.fromJson(deployConfig, chatServerProps);
+            ChatServerPropsConverter.fromJson(deployConfig, chatServerProps);
 
-                log.info(ChatServerVertx.chatServerProps.getChatServerName() + " start up");
+            log.info(ChatServerVertx.chatServerProps.getChatServerName() + " start up");
 
-                t = StopWatch.start();
-                List<Object> controllers = (List<Object>) objects.get(1);
-                List<WebSocketListener> webSocketListeners = (List<WebSocketListener>) objects.get(2);
+            t = StopWatch.start();
+            List<Object> controllers = (List<Object>) objects.get(1);
+            List<WebSocketListener> webSocketListeners = (List<WebSocketListener>) objects.get(2);
 
-                parsers = (Map<String, HttpArgumentParser>) objects.get(3);
-                httpHandlerMappings = collectHttp(controllers);
-                webSocketListenerMappings = collectWs(webSocketListeners);
-                return this;
-            };
+            parsers = (Map<String, HttpArgumentParser>) objects.get(3);
+            httpHandlerMappings = collectHttp(controllers);
+            webSocketListenerMappings = collectWs(webSocketListeners);
         }
 
         @Override

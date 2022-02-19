@@ -49,8 +49,8 @@ public class ChatServConfiguration {
         }).stream().map(BeanWrap::get).toList();
 
         // 优化
-        final var chatInit = new ChatServerVertx.ChatInit();
-        VerticleStarter.create(config, vertx).addDeploy("chat.vertx.fzdwx.core.ChatServerVertx", chatInit.preDeploy(() -> listOf(config, controller, ws, parsers().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()))))).start();
+        final var chatInit = new ChatServerVertx.ChatInit(() -> listOf(config, controller, ws, parsers().collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()))));
+        VerticleStarter.create(config, vertx).addDeploy("chat.vertx.fzdwx.core.ChatServerVertx", chatInit).start();
     }
 
     @Bean

@@ -8,7 +8,6 @@ import vertx.fzdwx.cn.core.verticle.init.VerticleDeployLifeCycle;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>
@@ -18,7 +17,7 @@ import java.util.function.Supplier;
 public class VerticleStarter {
 
     private static Vertx vertx;
-    private final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy = new HashMap<>();
+    private final Map<String, VerticleDeployLifeCycle<? extends Verticle>> deploy = new HashMap<>();
     private final JsonObject config;
     private VerticleBootStrap verticleBootStrap;
 
@@ -45,7 +44,7 @@ public class VerticleStarter {
      * @param verticleLifeCycle verticle生命周期
      * @return {@link VerticleStarter }
      */
-    public VerticleStarter addDeploy(String verticleClassName, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> verticleLifeCycle) {
+    public VerticleStarter addDeploy(String verticleClassName, VerticleDeployLifeCycle<? extends Verticle> verticleLifeCycle) {
         deploy.put(verticleClassName, verticleLifeCycle);
         return this;
     }
