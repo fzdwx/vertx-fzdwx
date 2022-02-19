@@ -15,6 +15,13 @@ import java.util.function.Supplier;
 public interface VerticleDeployLifeCycle<V extends Verticle> {
 
     /**
+     * 部署配置属性的前缀
+     *
+     * @return {@link String}
+     */
+    String deployPropsPrefix();
+
+    /**
      * 部署之前
      *
      * @param action 行动

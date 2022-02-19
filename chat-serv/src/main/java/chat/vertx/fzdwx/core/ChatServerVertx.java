@@ -10,6 +10,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import lombok.extern.slf4j.Slf4j;
 import vertx.fzdwx.cn.core.annotation.Controller;
@@ -42,7 +43,7 @@ import static vertx.fzdwx.cn.core.function.lang.format;
 @Slf4j
 public class ChatServerVertx extends Verticle {
 
-    private static ChatServerProps chatServerProps;
+    private static ChatServerProps chatServerProps = new ChatServerProps();
     private static Map<String, HttpArgumentParser> parsers;
     private static List<HttpHandlerMapping> httpHandlerMappings;
     private static List<WebSocketListenerMapping> webSocketListenerMappings;
@@ -164,12 +165,23 @@ public class ChatServerVertx extends Verticle {
         static StopWatch t;
 
         @Override
+        public String deployPropsPrefix() {
+            return "chatServ";
+        }
+
+        @Override
         public Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> preDeploy(InitCallable<List<Object>> action) {
             return () -> {
                 final var objects = action.call();
-                chatServerProps = (ChatServerProps) objects.get(0);
 
-                log.info(chatServerProps.getAppName() + " start up");
+                final JsonObject rawConfig = ((JsonObject) objects.get(0)).getJsonObject(deployPropsPrefix());
+                if (rawConfig == null) {
+                    throw new IllegalArgumentException(deployPropsPrefix() + " 配置文件为空");
+                }
+
+                ChatServerPropsConverter.fromJson(rawConfig, chatServerProps);
+
+                log.info(ChatServerVertx.chatServerProps.getChatServerName() + " start up");
 
                 t = StopWatch.start();
                 List<Object> controllers = (List<Object>) objects.get(1);
@@ -184,7 +196,7 @@ public class ChatServerVertx extends Verticle {
 
         @Override
         public void deployComplete(final AsyncResult<String> completion) {
-            log.info(chatServerProps.getAppName() + " started in " + t.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
+            log.info(chatServerProps.getChatServerName() + " started in " + t.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
         }
     }
 }

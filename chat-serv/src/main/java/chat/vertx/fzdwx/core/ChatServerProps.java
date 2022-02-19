@@ -18,7 +18,7 @@ public class ChatServerProps {
     /**
      * 应用程序名称
      */
-    private String appName = "chatServer";
+    private String chatServerName = "chatServer";
 
     /**
      * 当前chat server监听的端口

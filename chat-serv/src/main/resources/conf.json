@@ -1,4 +1,6 @@
 {
-  "appName": "myCharServ",
-  "port": 10010
+  "chatServ": {
+    "chatServerName": "myCharServ",
+    "port": 10010
+  }
 }

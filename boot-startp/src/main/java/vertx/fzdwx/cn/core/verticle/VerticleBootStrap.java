@@ -31,11 +31,14 @@ public class VerticleBootStrap {
      */
     public void deploy() {
         deploy.forEach((s, init) -> {
-            final VerticleDeployLifeCycle<? extends Verticle> verticleDeployLifeCycle = init.get();
-            final String string = config.getString("dep-charserv");
-            // vertx.deployVerticle(s, chatServerProps.getDeployOps(), completion -> {
-            vertx.deployVerticle(s, new DeploymentOptions(), completion -> {
-                verticleDeployLifeCycle.deployComplete(completion);
+            final VerticleDeployLifeCycle<? extends Verticle> lifeCycle = init.get();
+            final JsonObject deployConfig = config.getJsonObject(lifeCycle.deployPropsPrefix());
+            if (deployConfig == null) {
+                throw new IllegalArgumentException(lifeCycle.deployPropsPrefix() + " 未找到对于的部署配置");
+            }
+            
+            vertx.deployVerticle(s, new DeploymentOptions(deployConfig), completion -> {
+                lifeCycle.deployComplete(completion);
             });
         });
     }
