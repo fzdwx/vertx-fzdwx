@@ -11,8 +11,10 @@ import vertx.fzdwx.cn.core.annotation.Param;
 import java.util.Map;
 
 /**
+ * The type Test controller.
+ *
  * @author <a href="mailto:likelovec@gmail.com">like</a>
- * @date 2022/2/13 16:10
+ * @date 2022 /2/13 16:10
  */
 @Controller
 @Mapping("/qweqwe")

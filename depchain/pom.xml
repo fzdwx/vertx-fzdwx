@@ -32,7 +32,7 @@
         <dependencies>
             <dependency>
                 <groupId>vertx-fzdwx.cn.serv</groupId>
-                <artifactId>serv</artifactId>
+                <artifactId>boot-startp</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -40,22 +40,17 @@
                 <artifactId>common</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
-            <!-- 用于ioc 与 aop -->
+
+            <!-- vert.x 依赖管理 -->
             <dependency>
-                <groupId>org.noear</groupId>
-                <artifactId>solon</artifactId>
-                <version>${solon.version}</version>
-            </dependency>
-            <!-- yml配置支持组件 -->
-            <dependency>
-                <groupId>org.noear</groupId>
-                <artifactId>solon.extend.properties.yaml</artifactId>
-                <version>${solon.version}</version>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-codegen</artifactId>
+                <version>${vertx.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.noear</groupId>
-                <artifactId>logback-solon-plugin</artifactId>
-                <version>${solon.version}</version>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-redis-client</artifactId>
+                <version>${vertx.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
@@ -100,6 +95,7 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>

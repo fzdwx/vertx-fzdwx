@@ -1,8 +1,8 @@
 package chat.vertx.fzdwx;
 
+import chat.vertx.fzdwx.core.ws.WebSocketListener;
 import io.vertx.core.http.ServerWebSocket;
 import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
-import vertx.fzdwx.cn.serv.core.ws.WebSocketListener;
 
 /**
  * @author <a href="mailto:likelovec@gmail.com">like</a>

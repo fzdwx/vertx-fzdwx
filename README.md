@@ -7,6 +7,7 @@
 websocket测试网站：http://www.easyswoole.com/wstool.html
 
 ### http handler 与 websocket endpoint 挂载原理
+
 具体实现可以看=>[ChatServerVertx](https://github.com/fzdwx/chat/blob/3c3ed609b330bee8e818bb4808eb1c9017ac0602/serv/src/main/java/vertx/fzdwx/cn/serv/core/verticle/ChatServerVertx.java)
 <br>
 
@@ -31,6 +32,7 @@ public class TestController {
     }
 }
 ```
+
 <br>
 
 **websocket end point demo**
@@ -56,6 +58,7 @@ public class TestServerEndpoint implements WebSocketListener {
     }
 }
 ```
+
 <br>
 
 ### 启动
@@ -78,7 +81,7 @@ public class ChatServ {
 
         // 部署
         VerticleStarter.create(chatServerProps)
-                .addDeploy("vertx.fzdwx.cn.serv.core.verticle.ChatServerVertx",
+                .addDeploy("chat.vertx.fzdwx.core.ChatServerVertx",
                         // ChatServerVertx 生命周期实现类，用于初始化数据
                         new ChatServerVertx.ChatInit().preDeploy(() -> listOf(chatServerProps,
                                 controllers,
@@ -92,5 +95,6 @@ public class ChatServ {
 ```
 
 ### todo
+
 - mqtt?
 - 集群方案

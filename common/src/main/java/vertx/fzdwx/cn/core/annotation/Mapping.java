@@ -1,12 +1,15 @@
 package vertx.fzdwx.cn.core.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
+ * 绑定路由
+ * <ul>
+ *     <li>/hello/123</li>
+ *     <li>/hello/:id</li>
+ *     <li>/world/qwe/:id/:name</li>
+ * </ul>
+ *
  * @author <a href="mailto:likelovec@gmail.com">韦朕</a>
  * @date 2022/2/18 12:16
  */
@@ -15,5 +18,11 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Mapping {
 
+
+    /**
+     * 当前请求的路径
+     *
+     * @return the string
+     */
     String value();
 }
