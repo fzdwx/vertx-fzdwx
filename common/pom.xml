@@ -14,21 +14,21 @@
     </properties>
 
     <dependencies>
-        <!--   <dependency>
-               <groupId>org.noear</groupId>
-               <artifactId>solon</artifactId>
-           </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.noear</groupId>-->
-        <!--            <artifactId>solon.extend.properties.yaml</artifactId>-->
-        <!--        </dependency>-->
-        <!--<dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>logback-solon-plugin</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-redis-client</artifactId>
         </dependency>
         <!--        <dependency>-->
         <!--            <groupId>io.smallrye.reactive</groupId>-->
