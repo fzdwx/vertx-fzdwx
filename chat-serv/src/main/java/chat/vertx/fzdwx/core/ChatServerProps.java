@@ -1,8 +1,6 @@
 package chat.vertx.fzdwx.core;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.VertxOptions;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,25 +16,10 @@ public class ChatServerProps {
     /**
      * 应用程序名称
      */
-    private String chatServerName = "chatServer";
+    private String chatServerName;
 
     /**
      * 当前chat server监听的端口
      */
     private int port = 8888;
-
-    /**
-     * {@link VertxOptions#getEventLoopPoolSize()}
-     */
-    private int eventLoopPoolSize = VertxOptions.DEFAULT_EVENT_LOOP_POOL_SIZE;
-
-    /**
-     * {@link DeploymentOptions#getInstances()}
-     */
-    private int deployInstances = VertxOptions.DEFAULT_EVENT_LOOP_POOL_SIZE;
-
-    public DeploymentOptions getDeployOps() {
-        return new DeploymentOptions().setInstances(deployInstances);
-    }
-
 }

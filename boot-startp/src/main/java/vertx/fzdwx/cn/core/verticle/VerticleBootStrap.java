@@ -4,6 +4,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
+import vertx.fzdwx.cn.core.util.JsonObjectUtil;
 import vertx.fzdwx.cn.core.verticle.init.VerticleDeployLifeCycle;
 
 import java.util.Map;
@@ -32,9 +33,12 @@ public class VerticleBootStrap {
     public void deploy() {
         deploy.forEach((s, init) -> {
             final VerticleDeployLifeCycle<? extends Verticle> lifeCycle = init.get();
-            final JsonObject deployConfig = config.getJsonObject(lifeCycle.deployPropsPrefix());
+            JsonObject deployConfig = config.getJsonObject(lifeCycle.deployPropsPrefix());
             if (deployConfig == null) {
-                throw new IllegalArgumentException(lifeCycle.deployPropsPrefix() + " 未找到对应的部署配置");
+                deployConfig = JsonObjectUtil.collect(lifeCycle.deployPropsPrefix(), config);
+                if (deployConfig.size() == 0) {
+                    throw new IllegalArgumentException(lifeCycle.deployPropsPrefix() + " 未找到对应的部署配置");
+                }
             }
 
             vertx.deployVerticle(s, new DeploymentOptions(deployConfig), completion -> {

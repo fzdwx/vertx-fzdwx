@@ -18,6 +18,7 @@ import vertx.fzdwx.cn.core.annotation.Mapping;
 import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
 import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.util.Exc;
+import vertx.fzdwx.cn.core.util.JsonObjectUtil;
 import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
 import vertx.fzdwx.cn.core.verticle.Verticle;
@@ -173,13 +174,16 @@ public class ChatServerVertx extends Verticle {
         public Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>> preDeploy(InitCallable<List<Object>> action) {
             return () -> {
                 final var objects = action.call();
-
-                final JsonObject rawConfig = ((JsonObject) objects.get(0)).getJsonObject(deployPropsPrefix());
-                if (rawConfig == null) {
-                    throw new IllegalArgumentException(deployPropsPrefix() + " 配置文件为空");
+                final JsonObject config = ((JsonObject) objects.get(0));
+                var deployConfig = config.getJsonObject(deployPropsPrefix());
+                if (deployConfig == null) {
+                    deployConfig = JsonObjectUtil.collect(deployPropsPrefix(), config);
+                    if (deployConfig.size() == 0) {
+                        throw new IllegalArgumentException(deployPropsPrefix() + " 未找到对应的部署配置");
+                    }
                 }
 
-                ChatServerPropsConverter.fromJson(rawConfig, chatServerProps);
+                ChatServerPropsConverter.fromJson(deployConfig, chatServerProps);
 
                 log.info(ChatServerVertx.chatServerProps.getChatServerName() + " start up");
 

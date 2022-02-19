@@ -17,18 +17,25 @@ import java.util.function.Supplier;
 @Slf4j
 public class VerticleStarter {
 
+    private static Vertx vertx;
     private final Map<String, Supplier<? extends VerticleDeployLifeCycle<? extends Verticle>>> deploy = new HashMap<>();
-    private final Vertx vertx;
     private final JsonObject config;
     private VerticleBootStrap verticleBootStrap;
 
-    private VerticleStarter(final Vertx vertx, final JsonObject config) {
-        this.vertx = vertx;
+    private VerticleStarter(final JsonObject config, final Vertx vertx) {
+        VerticleStarter.vertx = vertx;
         this.config = config;
     }
 
-    public static VerticleStarter create(Vertx vertx, final JsonObject config) {
-        return new VerticleStarter(vertx, config);
+    public static VerticleStarter create(final JsonObject config, final Vertx vertx) {
+        return new VerticleStarter(config, vertx);
+    }
+
+    /**
+     * vertx
+     */
+    public static Vertx vertx() {
+        return vertx;
     }
 
     /**
@@ -57,13 +64,6 @@ public class VerticleStarter {
      */
     public void destroy() {
         verticleBootStrap.stop();
-    }
-
-    /**
-     * vertx
-     */
-    public Vertx vertx() {
-        return vertx;
     }
 
     private static void printBanner() {

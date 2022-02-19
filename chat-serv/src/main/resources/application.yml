@@ -1,0 +1,29 @@
+solon.app:
+  name: myCharServ
+
+fzdwx:
+  vertx:
+    eventLoopPoolSize: 50
+  redis:
+    endpoint: "redis://localhost:637955555555"
+
+chatServ:
+  chatServerName: myCharServ
+  port: 10010
+  instances: 50
+
+
+# solon log
+solon.logging.appender:
+  console:
+    level: info
+    pattern: "%highlight(%-5level %d{yyyy-MM-dd HH:mm:ss.SSS} [-%t][*%X{traceId}]%tags%boldMagenta([%logger{20}]) =>) %msg%n"
+  file:
+    name: "logs/${solon.app.name}"
+    level: INFO
+    pattern: "%-5level %d{yyyy-MM-dd HH:mm:ss.SSS} [-%t][*%X{traceId}]%tags[%logger{20}]: %n%msg%n"
+
+# 记录器级别的配置示例
+solon.logging.logger:
+  "io.netty.*":
+    level: debug
