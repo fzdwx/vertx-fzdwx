@@ -18,6 +18,7 @@ public interface VerticleDeployLifeCycle<V extends Verticle> {
      * 部署配置属性的前缀
      *
      * @return {@link String}
+     * @see io.vertx.core.DeploymentOptions
      */
     String deployPropsPrefix();
 

@@ -1,6 +1,11 @@
 {
+  "eventLoopPoolSize": 50,
+  "redis": {
+    "endpoint": "redis://localhost:6379"
+  },
   "chatServ": {
     "chatServerName": "myCharServ",
-    "port": 10010
+    "port": 10010,
+    "instances": 50
   }
 }

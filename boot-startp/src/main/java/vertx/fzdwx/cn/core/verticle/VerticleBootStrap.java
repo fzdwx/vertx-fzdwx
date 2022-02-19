@@ -34,9 +34,9 @@ public class VerticleBootStrap {
             final VerticleDeployLifeCycle<? extends Verticle> lifeCycle = init.get();
             final JsonObject deployConfig = config.getJsonObject(lifeCycle.deployPropsPrefix());
             if (deployConfig == null) {
-                throw new IllegalArgumentException(lifeCycle.deployPropsPrefix() + " 未找到对于的部署配置");
+                throw new IllegalArgumentException(lifeCycle.deployPropsPrefix() + " 未找到对应的部署配置");
             }
-            
+
             vertx.deployVerticle(s, new DeploymentOptions(deployConfig), completion -> {
                 lifeCycle.deployComplete(completion);
             });
