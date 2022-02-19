@@ -96,5 +96,8 @@ public class ChatServ {
 
 ### todo
 
+- 用redis先一点简单的功能
+    - 登录
+    - 聊天
 - mqtt?
 - 集群方案
