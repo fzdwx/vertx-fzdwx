@@ -30,7 +30,7 @@ public class VerticleBootStrap {
      * 部署
      */
     public void deploy() {
-        deploy.forEach((className, lifeCycle) -> {
+        deploy.forEach((s, lifeCycle) -> {
             lifeCycle.preDeploy();
             JsonObject deployConfig = config.getJsonObject(lifeCycle.deployPropsPrefix());
             if (deployConfig == null) {
@@ -40,7 +40,9 @@ public class VerticleBootStrap {
                 }
             }
 
-            vertx.deployVerticle(className, new DeploymentOptions(deployConfig), completion -> {
+            final var options = new DeploymentOptions();
+            options.setInstances(Integer.parseInt(deployConfig.getString("instances")));
+            vertx.deployVerticle(s, options, completion -> {
                 lifeCycle.deployComplete(completion);
             });
         });

@@ -1,13 +1,14 @@
 package chat.vertx.fzdwx.api;
 
-import chat.vertx.fzdwx.api.domain.req.SignInReq;
-import lombok.RequiredArgsConstructor;
+import io.vertx.ext.web.RoutingContext;
 import org.noear.solon.annotation.Component;
-import vertx.fzdwx.cn.core.annotation.Body;
+import org.noear.solon.annotation.Inject;
 import vertx.fzdwx.cn.core.annotation.Controller;
+import vertx.fzdwx.cn.core.annotation.Get;
 import vertx.fzdwx.cn.core.annotation.Mapping;
-import vertx.fzdwx.cn.core.annotation.Post;
 import vertx.fzdwx.cn.redis.RedisApi;
+
+import java.util.Map;
 
 /**
  * 用户认证相关
@@ -18,20 +19,18 @@ import vertx.fzdwx.cn.redis.RedisApi;
 @Component
 @Controller
 @Mapping("/auth")
-@RequiredArgsConstructor
 public class AuthApi {
 
-    // @Inject
+    @Inject
     private RedisApi redis;
 
     /**
      * Sign in.
-     *
-     * @param req the req
      */
-    @Post
+    @Get
     @Mapping("/signIn")
-    public void signIn(@Body SignInReq req) {
+    public Map<Integer, Integer> signIn(RoutingContext context) {
         System.out.println(redis);
+        return Map.of(1, 2);
     }
 }
