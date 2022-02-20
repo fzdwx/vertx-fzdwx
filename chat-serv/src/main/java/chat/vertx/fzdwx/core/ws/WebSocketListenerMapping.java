@@ -32,9 +32,12 @@ public class WebSocketListenerMapping {
      * 将当前websocket请求处理器挂载到router上
      *
      * @param router router
+     * @param first
      */
-    public void attach(final Router router) {
-        log.info("WebSocket Endpoint Registered: " + path);
+    public void attach(final Router router, final boolean first) {
+        if (first) {
+            log.info("WebSocket Endpoint Registered: " + path);
+        }
 
         router.get(path)
                 .handler(ctx -> {

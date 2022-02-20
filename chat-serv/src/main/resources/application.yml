@@ -6,6 +6,8 @@ chatServ:
   port: 10010
   vertx:
     eventLoopPoolSize: 50
+  deploy:
+    instances: 20
   redis:
     endpoints:
       - "redis://localhost:7777"

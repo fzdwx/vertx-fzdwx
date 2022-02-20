@@ -8,15 +8,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import lombok.extern.slf4j.Slf4j;
 import vertx.fzdwx.cn.core.annotation.Controller;
 import vertx.fzdwx.cn.core.annotation.Mapping;
 import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
 import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.util.Exc;
-import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.core.util.Utils;
 import vertx.fzdwx.cn.core.verticle.Verticle;
 import vertx.fzdwx.cn.core.wraper.HttpMethodWrap;
@@ -26,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,33 +38,31 @@ import static vertx.fzdwx.cn.core.function.lang.format;
  * @date 2022/2/16 17:52
  */
 @Slf4j
-public class ChatServerVertx implements Verticle {
+public class ChatServerVertx extends Verticle {
 
     private static Map<String, HttpArgumentParser> parsers;
-    private final ChatServerProps chatServerProps;
-    private final Router router;
-    private final Vertx vertx;
-    private final List<HttpHandlerMapping> httpHandlerMappings;
-    private final List<WebSocketListenerMapping> webSocketListenerMappings;
-    private final StopWatch t;
-    private HttpServer chatServer;
+    private static ChatServerProps chatServerProps;
+    private static Router router;
+    private static List<HttpHandlerMapping> httpHandlerMappings;
+    private static List<WebSocketListenerMapping> webSocketListenerMappings;
 
-    public ChatServerVertx(ChatServerProps pops,
-                           Vertx vertx,
-                           List<Object> controllers,
-                           List<WebSocketListener> webSocketListeners,
-                           Stream<HttpArgumentParser> parsers) {
-        this.t = StopWatch.start();
+    private static AtomicInteger instanceCount = new AtomicInteger(0);
+
+    private static boolean first = false;  // 是否 第一个httpServer实例
+
+    {
+        //初始化时， 先要new一个实例， 读取VerticleConfig中的信息， 所以除去第一次new， count是从 1开始的。
+        int number = instanceCount.getAndIncrement();
+        first = number == 1;
+    }
+
+    public static void init(ChatServerProps pops, List<Object> controllers, List<WebSocketListener> webSocketListeners, Stream<HttpArgumentParser> parsers) {
         log.info(pops.getChatServerName() + " start up");
 
-        this.chatServerProps = pops;
+        chatServerProps = pops;
         ChatServerVertx.parsers = parsers.collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
-        this.vertx = vertx;
-        this.router = Router.router(vertx);
-        this.httpHandlerMappings = collectHttp(controllers);
-        this.webSocketListenerMappings = collectWs(webSocketListeners);
-        initWsHandler();
-        initHttpHandler();
+        httpHandlerMappings = collectHttp(controllers);
+        webSocketListenerMappings = collectWs(webSocketListeners);
     }
 
     @Override
@@ -74,26 +72,28 @@ public class ChatServerVertx implements Verticle {
 
     @Override
     public void start() {
-        vertx.createHttpServer()
-                .exceptionHandler(ex -> {
-                    log.error("", ex.getCause());
-                })
-                .requestHandler(router)
-                .listen(chatServerProps.getPort(), res -> {
-                    log.info(chatServerProps.getChatServerName() + " started in " + t.stop() + " ms. Listening on: " + "http://localhost:" + chatServerProps.getPort());
-                });
-
+        router = Router.router(vertx);
+        initRouter();
+        initWsHandler();
+        initHttpHandler();
+        vertx.createHttpServer().exceptionHandler(ex -> {
+            log.error("get exc", ex.getCause());
+        }).requestHandler(router).listen(chatServerProps.getPort());
     }
 
-    private void initWsHandler() {
-        webSocketListenerMappings.forEach(w -> {
-            w.attach(router);
+    private static void initHttpHandler() {
+        httpHandlerMappings.forEach(w -> {
+            w.attach(router, first);
         });
     }
 
-    private void initHttpHandler() {
-        httpHandlerMappings.forEach(w -> {
-            w.attach(router);
+    private static void initRouter() {
+        router.route().handler(BodyHandler.create());
+    }
+
+    private static void initWsHandler() {
+        webSocketListenerMappings.forEach(w -> {
+            w.attach(router, first);
         });
     }
 
@@ -114,10 +114,7 @@ public class ChatServerVertx implements Verticle {
 
     private static HttpMethod initMethodType(Method method) {
         final var httpType = Utils.allHttpType();
-        final var last = CollUtil.getLast(lang.split(Arrays.stream(method.getAnnotations())
-                .filter(o -> httpType.contains(o.annotationType()))
-                .findFirst().orElseThrow(() -> Exc.chat(method.getName() + " 未识别出Http method Type"))
-                .annotationType().getName(), "."));
+        final var last = CollUtil.getLast(lang.split(Arrays.stream(method.getAnnotations()).filter(o -> httpType.contains(o.annotationType())).findFirst().orElseThrow(() -> Exc.chat(method.getName() + " 未识别出Http method Type")).annotationType().getName(), "."));
         return HttpMethod.valueOf(last.toUpperCase(Locale.ROOT));
     }
 
@@ -130,17 +127,15 @@ public class ChatServerVertx implements Verticle {
     }
 
     private static List<WebSocketListenerMapping> collectWs(List<WebSocketListener> webSocketListeners) {
-        return webSocketListeners.stream()
-                .map(source -> {
-                    final var serverEndpoint = source.getClass().getAnnotation(ServerEndpoint.class);
-                    if (serverEndpoint == null) {
-                        throw new IllegalArgumentException("webSocketListener 必须有@ServerEndpoint注解");
-                    }
+        return webSocketListeners.stream().map(source -> {
+            final var serverEndpoint = source.getClass().getAnnotation(ServerEndpoint.class);
+            if (serverEndpoint == null) {
+                throw new IllegalArgumentException("webSocketListener 必须有@ServerEndpoint注解");
+            }
 
-                    log.info("WebSocket Endpoint Find: " + format("[ {}, Path: {} ]", source.getClass(), serverEndpoint.value()));
-                    return WebSocketListenerMapping.create(source, initWsPath(serverEndpoint));
-                })
-                .toList();
+            log.info("WebSocket Endpoint Find: " + format("[ {}, Path: {} ]", source.getClass(), serverEndpoint.value()));
+            return WebSocketListenerMapping.create(source, initWsPath(serverEndpoint));
+        }).toList();
     }
 
     private static List<HttpHandlerMapping> collectHttp(List<Object> controllers) {
@@ -157,9 +152,7 @@ public class ChatServerVertx implements Verticle {
             final var rootPath = defVal(mapping.value(), "/");
             log.info("Http Controller Find: " + format("[ {}, rootPath: {} ]", c.getClass(), rootPath));
 
-            return Utils.collectMethod(c.getClass().getDeclaredMethods(), Utils.allHttpType()).stream()
-                    .map(method -> initMethod(rootPath, method))
-                    .map(methodWrap -> HttpHandlerMapping.create(c, methodWrap, parsers));
+            return Utils.collectMethod(c.getClass().getDeclaredMethods(), Utils.allHttpType()).stream().map(method -> initMethod(rootPath, method)).map(methodWrap -> HttpHandlerMapping.create(c, methodWrap, parsers));
         }).toList();
     }
 }

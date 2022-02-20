@@ -7,6 +7,7 @@ import chat.vertx.fzdwx.core.parser.HttpArgumentParser;
 import chat.vertx.fzdwx.core.parser.ParamParser;
 import chat.vertx.fzdwx.core.parser.RoutingContextParser;
 import chat.vertx.fzdwx.core.ws.WebSocketListener;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.redis.client.RedisOptions;
@@ -18,6 +19,7 @@ import org.noear.solon.core.Aop;
 import org.noear.solon.core.BeanWrap;
 import vertx.fzdwx.cn.core.annotation.Controller;
 import vertx.fzdwx.cn.core.annotation.ServerEndpoint;
+import vertx.fzdwx.cn.core.util.StopWatch;
 import vertx.fzdwx.cn.redis.Redis;
 import vertx.fzdwx.cn.redis.RedisApi;
 
@@ -33,19 +35,18 @@ import java.util.stream.Stream;
 public class ChatServConfiguration {
 
     @Bean
-    public void verticleStarter(@Inject("${chatServ}") ChatServerProps props,
-                                @Inject Vertx vertx) {
+    public void verticleStarter(@Inject("${chatServ}") ChatServerProps props, @Inject("${chatServ.deploy}") DeploymentOptions deploymentOptions, @Inject Vertx vertx) {
 
-        final var controller = Aop.context().beanFind(p -> p.annotationGet(Controller.class) != null)
-                .stream().map(BeanWrap::get)
-                .toList();
+        final var controller = Aop.context().beanFind(p -> p.annotationGet(Controller.class) != null).stream().map(BeanWrap::get).toList();
 
-        final List<WebSocketListener> ws = Aop.context().beanFind(p -> p.annotationGet(ServerEndpoint.class) != null)
-                .stream().map(b -> ((WebSocketListener) b.get()))
-                .toList();
+        final List<WebSocketListener> ws = Aop.context().beanFind(p -> p.annotationGet(ServerEndpoint.class) != null).stream().map(b -> ((WebSocketListener) b.get())).toList();
 
-        new ChatServerVertx(props, vertx, controller, ws, parsers())
-                .start();
+
+        var t = StopWatch.start();
+        ChatServerVertx.init(props, controller, ws, parsers());
+        vertx.deployVerticle(ChatServerVertx.class.getName(), deploymentOptions);
+        log.info(props.getChatServerName() + " started in " + t.stop() + " ms. Listening on: " + "http://localhost:" + props.getPort());
+
     }
 
     @Bean

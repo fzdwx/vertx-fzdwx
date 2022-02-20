@@ -1,2 +1,2 @@
-curl --location --request GET 'http://localhost:10010/qweqwe/hello/444/like' \
+curl --location --request GET 'http://localhost:10010/auth/signIn' \
 --header 'Content-Type: application/json'

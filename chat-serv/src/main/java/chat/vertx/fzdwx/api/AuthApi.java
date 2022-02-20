@@ -1,12 +1,14 @@
 package chat.vertx.fzdwx.api;
 
+import chat.vertx.fzdwx.api.domain.req.SignInReq;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
+import vertx.fzdwx.cn.core.annotation.Body;
 import vertx.fzdwx.cn.core.annotation.Controller;
-import vertx.fzdwx.cn.core.annotation.Get;
 import vertx.fzdwx.cn.core.annotation.Mapping;
+import vertx.fzdwx.cn.core.annotation.Post;
 import vertx.fzdwx.cn.redis.RedisApi;
 
 import java.util.Map;
@@ -29,11 +31,10 @@ public class AuthApi {
     /**
      * Sign in.
      */
-    @Get
+    @Post
     @Mapping("/signIn")
-    public Map<Integer, Integer> signIn(RoutingContext context) {
-        log.info("test");
-        System.out.println(redis);
+    public Map<Integer, Integer> signIn(RoutingContext context, @Body SignInReq req) {
+        System.out.println(req);
         return Map.of(1, 2);
     }
 }
