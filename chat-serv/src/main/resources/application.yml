@@ -1,16 +1,14 @@
 solon.app:
   name: myCharServ
 
-fzdwx:
-  vertx:
-    eventLoopPoolSize: 50
-  redis:
-    endpoint: "redis://localhost:637955555555"
-
 chatServ:
   chatServerName: myCharServ
   port: 10010
-  instances: 50
+  vertx:
+    eventLoopPoolSize: 50
+  redis:
+    endpoints:
+      - "redis://localhost:7777"
 
 
 # solon log

@@ -39,52 +39,54 @@ public class WebSocketListenerMapping {
         router.get(path)
                 .handler(ctx -> {
                     ctx.request().toWebSocket()
-                            .onSuccess(ws -> {
+                            .onSuccess(s -> {
+                                final var wrap = WsWrap.of(s, ctx);
+
                                 // onClose
-                                ws.closeHandler(v -> {
-                                    source.onclose(ws);
+                                s.closeHandler(v -> {
+                                    source.onclose(wrap);
                                 });
 
                                 //region websocket 握手  1
-                                source.doOnHandShake(ws.headers(), ar -> {
+                                source.doOnHandShake(s.headers(), ar -> {
                                     if (ar.failed()) {
-                                        ws.writeTextMessage(ar.cause().getMessage())
-                                                .onComplete(res -> ws.close());
+                                        s.writeTextMessage(ar.cause().getMessage())
+                                                .onComplete(res -> s.close());
                                     }
                                 });
                                 //endregion
 
                                 // onOpen               2
-                                source.onOpen(ws);
+                                source.onOpen(wrap);
 
                                 //region 处理来自客户端的数据
-                                ws.pongHandler(buf -> {
-                                    source.handlePong(ws, buf);
+                                s.pongHandler(buf -> {
+                                    source.handlePong(wrap, buf);
                                 });
 
-                                ws.frameHandler(f -> {
+                                s.frameHandler(f -> {
                                     if (f.isPing()) {
-                                        source.handlePing(ws, f);
+                                        source.handlePing(wrap, f);
                                     }
                                 });
 
-                                ws.binaryMessageHandler(buf -> {
-                                    source.handleBinary(ws, buf);
+                                s.binaryMessageHandler(buf -> {
+                                    source.handleBinary(wrap, buf);
                                 });
 
-                                ws.textMessageHandler(text -> {
-                                    source.handleText(ws, text);
+                                s.textMessageHandler(text -> {
+                                    source.handleText(wrap, text);
                                 });
                                 //endregion
 
                                 // websocket 中的异常
-                                ws.exceptionHandler(exc -> {
-                                    source.onError(ws, exc);
+                                s.exceptionHandler(exc -> {
+                                    source.onError(wrap, exc);
                                 });
 
                                 // 在onClose后执行  todo 是否要加入webSocketListener中？
-                                ws.endHandler(v -> {
-                                    log.info("Websocket Stream End");
+                                s.endHandler(v -> {
+                                    source.onEnd(wrap);
                                 });
                             });
                 });

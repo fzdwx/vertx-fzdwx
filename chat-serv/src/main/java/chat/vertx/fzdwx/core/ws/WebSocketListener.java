@@ -5,7 +5,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocketFrame;
 import vertx.fzdwx.cn.core.function.lang;
 import vertx.fzdwx.cn.core.function.tuple.Tuple;
@@ -43,14 +42,14 @@ public interface WebSocketListener {
      *
      * @param ws ws
      */
-    void onOpen(final ServerWebSocket ws);
+    void onOpen(final WsWrap ws);
 
     /**
      * 当websocket 通道关闭时调用
      *
      * @param ws ws
      */
-    void onclose(final ServerWebSocket ws);
+    void onclose(final WsWrap ws);
 
     /**
      * 当websocket发生错误
@@ -58,7 +57,7 @@ public interface WebSocketListener {
      * @param ws  websocket
      * @param thr thr
      */
-    void onError(ServerWebSocket ws, Throwable thr);
+    void onError(final WsWrap ws, Throwable thr);
 
     /**
      * 处理二进制数据
@@ -66,7 +65,7 @@ public interface WebSocketListener {
      * @param ws  websocket
      * @param buf 二进制数据Buf
      */
-    default void handleBinary(final ServerWebSocket ws, Buffer buf) {
+    default void handleBinary(final WsWrap ws, Buffer buf) {
         //
     }
 
@@ -76,7 +75,7 @@ public interface WebSocketListener {
      * @param ws      websocket
      * @param message message
      */
-    default void handleText(final ServerWebSocket ws, String message) {
+    default void handleText(final WsWrap ws, String message) {
         //
     }
 
@@ -86,8 +85,8 @@ public interface WebSocketListener {
      * @param ws  websocket
      * @param buf 数据帧
      */
-    default void handlePong(final ServerWebSocket ws, Buffer buf) {
-        ws.writeFrame(WebSocketFrame.pingFrame(Buffer.buffer("PING")));
+    default void handlePong(final WsWrap ws, Buffer buf) {
+        ws.source().writeFrame(WebSocketFrame.pingFrame(Buffer.buffer("PING")));
     }
 
     /**
@@ -96,8 +95,8 @@ public interface WebSocketListener {
      * @param ws    websocket
      * @param frame 数据帧
      */
-    default void handlePing(final ServerWebSocket ws, WebSocketFrame frame) {
-        ws.writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG")));
+    default void handlePing(final WsWrap ws, WebSocketFrame frame) {
+        ws.source().writeFrame(WebSocketFrame.pongFrame(Buffer.buffer("PONG")));
     }
 
     default void doOnHandShake(MultiMap headers, Handler<AsyncResult<Integer>> resultHandler) {
@@ -107,4 +106,6 @@ public interface WebSocketListener {
         else
             resultHandler.handle(Future.succeededFuture());
     }
+
+    void onEnd(WsWrap wrap);
 }

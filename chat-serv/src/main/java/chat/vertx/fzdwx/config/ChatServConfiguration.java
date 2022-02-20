@@ -7,13 +7,10 @@ import chat.vertx.fzdwx.core.parser.HttpArgumentParser;
 import chat.vertx.fzdwx.core.parser.ParamParser;
 import chat.vertx.fzdwx.core.parser.RoutingContextParser;
 import chat.vertx.fzdwx.core.ws.WebSocketListener;
-import cn.hutool.json.JSONUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
+import io.vertx.redis.client.RedisOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.noear.solon.Solon;
 import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Configuration;
 import org.noear.solon.annotation.Inject;
@@ -36,49 +33,34 @@ import java.util.stream.Stream;
 public class ChatServConfiguration {
 
     @Bean
-    void verticleStarter(@Inject Vertx vertx) {
-        final var config = getConfig(null);
-        final var controller = Aop.context().beanFind(p -> {
-            return p.annotationGet(Controller.class) != null;
-        }).stream().map(BeanWrap::get).toList();
+    public void verticleStarter(@Inject("${chatServ}") ChatServerProps props,
+                                @Inject Vertx vertx) {
+
+        final var controller = Aop.context().beanFind(p -> p.annotationGet(Controller.class) != null)
+                .stream().map(BeanWrap::get)
+                .toList();
 
         final List<WebSocketListener> ws = Aop.context().beanFind(p -> p.annotationGet(ServerEndpoint.class) != null)
                 .stream().map(b -> ((WebSocketListener) b.get()))
                 .toList();
 
-        new ChatServerVertx(new ChatServerProps(), controller, ws, parsers()).start();
+        new ChatServerVertx(props, vertx, controller, ws, parsers())
+                .start();
     }
 
     @Bean
-    Stream<HttpArgumentParser> parsers() {
+    public Vertx vertx(@Inject("${chatServ.vertx}") VertxOptions vertxOps) {
+        return Vertx.vertx(vertxOps);
+    }
+
+    @Bean
+    public Stream<HttpArgumentParser> parsers() {
         return Stream.of(new ParamParser(), new RoutingContextParser(), new BodyParser());
     }
 
-
     @Bean
-    public RedisApi redisApi(@Inject Vertx vertx) {
-        final var config = getConfig("fzdwx.redis");
-        final var redis = Redis.client(vertx, config);
-
-        log.info("redis inject");
-        return redis;
-    }
-
-    @Bean
-    public Vertx vertx() {
-        final var config = getConfig("fzdwx.vertx");
-        final var vertx = Vertx.vertx(new VertxOptions(config));
-
-        log.info("vertx inject");
-        return vertx;
-    }
-
-    public JsonObject getConfig(String prefix) {
-        if (prefix == null || prefix.isBlank())
-            return JsonObject.mapFrom(Json.decodeValue(JSONUtil.toJsonStr(Solon.cfg())));
-
-        final var raw = JSONUtil.toJsonStr(Solon.cfg().getProp(prefix));
-        return JsonObject.mapFrom(Json.decodeValue(raw));
+    public RedisApi redisApi(@Inject Vertx vertx, @Inject("${chatServ.redis}") RedisOptions redisOptions) {
+        return Redis.client(vertx, redisOptions);
     }
 
 }

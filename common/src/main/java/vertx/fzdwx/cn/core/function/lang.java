@@ -11,17 +11,7 @@ import lombok.NonNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -94,7 +84,9 @@ public interface lang {
     /**
      * 格式化，占位符使用{}
      */
-    static String format(String template, Object... params) { return StrUtil.format(template,params); }
+    static String format(String template, Object... params) {
+        return StrUtil.format(template, params);
+    }
 
     /**
      * 将 {@link Date} 转换为unix 时间戳
@@ -497,6 +489,18 @@ public interface lang {
                 .flatMap(e -> Stream.of(e.getKey(), e.getValue())).toArray();
     }
 
+    static String[] flat2(final Map<String, String> map) {
+        final var s = new String[map.size() << 1];
+        int curr = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            s[curr++] = k;
+            s[curr++] = v;
+        }
+        return s;
+    }
+
     static <K, V> Map<K, V> mapOf() {
         return new HashMap<>();
     }
@@ -728,10 +732,10 @@ public interface lang {
     }
 
     static List<String> split(String text) {
-        return StrUtil.split(text,".");
+        return StrUtil.split(text, ".");
     }
 
-    static List<String> split(String text,String pattern) {
-        return StrUtil.split(text,pattern);
+    static List<String> split(String text, String pattern) {
+        return StrUtil.split(text, pattern);
     }
 }

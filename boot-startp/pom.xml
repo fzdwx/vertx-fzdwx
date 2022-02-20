@@ -59,11 +59,7 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-codegen</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -77,20 +73,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <!-- <annotationProcessorPaths>
-                         <path>
-                             <groupId>org.projectlombok</groupId>
-                             <artifactId>lombok</artifactId>
-                             <version>1.18.22</version>
-                         </path>
-                     </annotationProcessorPaths>-->
-                    <annotationProcessors>
-                        <annotationProcessor>
-                            lombok.launch.AnnotationProcessorHider$AnnotationProcessor,io.vertx.codegen.CodeGenProcessor
-                        </annotationProcessor>
-                    </annotationProcessors>
-                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations
-                    </generatedSourcesDirectory>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.22</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <source>17</source>
                     <target>17</target>
                 </configuration>

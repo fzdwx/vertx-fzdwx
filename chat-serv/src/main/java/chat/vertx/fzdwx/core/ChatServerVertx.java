@@ -50,6 +50,7 @@ public class ChatServerVertx implements Verticle {
     private HttpServer chatServer;
 
     public ChatServerVertx(ChatServerProps pops,
+                           Vertx vertx,
                            List<Object> controllers,
                            List<WebSocketListener> webSocketListeners,
                            Stream<HttpArgumentParser> parsers) {
@@ -57,8 +58,8 @@ public class ChatServerVertx implements Verticle {
         log.info(pops.getChatServerName() + " start up");
 
         this.chatServerProps = pops;
-        this.parsers = parsers.collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
-        this.vertx = Vertx.vertx(pops.getVertxOps());
+        ChatServerVertx.parsers = parsers.collect(Collectors.toMap(HttpArgumentParser::type, Function.identity()));
+        this.vertx = vertx;
         this.router = Router.router(vertx);
         this.httpHandlerMappings = collectHttp(controllers);
         this.webSocketListenerMappings = collectWs(webSocketListeners);

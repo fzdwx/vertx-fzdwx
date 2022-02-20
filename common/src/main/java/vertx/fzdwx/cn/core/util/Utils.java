@@ -1,11 +1,13 @@
 package vertx.fzdwx.cn.core.util;
 
 
+import lombok.SneakyThrows;
 import vertx.fzdwx.cn.core.annotation.Get;
 import vertx.fzdwx.cn.core.annotation.Post;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,5 +58,10 @@ public interface Utils {
                 Get.class,
                 Post.class
         );
+    }
+
+    @SneakyThrows
+    static String localhost() {
+        return InetAddress.getLocalHost().getHostAddress();
     }
 }

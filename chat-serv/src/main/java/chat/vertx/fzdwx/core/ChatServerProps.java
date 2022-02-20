@@ -1,7 +1,5 @@
 package chat.vertx.fzdwx.core;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.VertxOptions;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +9,6 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-@DataObject(generateConverter = true)
 public class ChatServerProps {
 
     /**
@@ -23,8 +20,4 @@ public class ChatServerProps {
      * 当前chat server监听的端口
      */
     private int port = 8888;
-
-    public VertxOptions getVertxOps() {
-        return new VertxOptions();
-    }
 }

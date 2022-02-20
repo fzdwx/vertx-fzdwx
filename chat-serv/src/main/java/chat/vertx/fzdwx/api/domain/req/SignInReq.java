@@ -1,6 +1,5 @@
 package chat.vertx.fzdwx.api.domain.req;
 
-import io.vertx.codegen.annotations.DataObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,6 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-@DataObject(generateConverter = true)
 public class SignInReq {
 
     /**
